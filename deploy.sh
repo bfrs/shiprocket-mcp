@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT_DIR="/home/ubuntu/mcp"
+PROJECT_DIR="/home/ubuntu/shiprocket-mcp"
 
 if [ ! -d "$PROJECT_DIR" ]; then
     git clone git@github.com:bfrs/shiprocket-mcp.git
