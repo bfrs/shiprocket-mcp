@@ -7,7 +7,7 @@ if [ ! -d "$PROJECT_DIR" ]; then
 fi
 
 cd "$PROJECT_DIR"
-git reset --hard && git clean -fd && git checkout dev
+git reset --hard && git clean -fd && git checkout main
 git pull
 
 docker compose up -d --build
