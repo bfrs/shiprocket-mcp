@@ -1,5 +1,5 @@
 {
-  "name": "mcp-server",
+  "name": "shiprocket-mcp",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

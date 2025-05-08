@@ -1,14 +1,7 @@
 services:
-  mcp-server:
+  server:
     build:
-      context: mcp-server
+      context: .
     restart: always
     ports:
       - 3000:3000
-
-  mcp-client:
-    build:
-      context: mcp-client
-    restart: always
-    ports:
-      - 3001:3000
