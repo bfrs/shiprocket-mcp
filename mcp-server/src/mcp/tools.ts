@@ -94,4 +94,77 @@ export const initializeTools = (server: McpServer) => {
       }
     }
   );
+
+  server.tool(
+    "rate_calculator",
+    `Given pickup and delivery pincodes, fetch shipping couriers, their prices and EDDs (Estimated Delivery Dates)`,
+    {
+      pickup_postcode: zod.string(),
+      delivery_postcode: zod.string(),
+      weight_in_kg: zod.number(),
+      is_cod: zod.boolean(),
+    },
+    async (
+      {
+        pickup_postcode: pickupPincode,
+        delivery_postcode: deliveryPostcode,
+        weight_in_kg: weight,
+        is_cod: isCod,
+      },
+      context
+    ) => {
+      const srApiDomain = "https://serviceability.shiprocket.in";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
+        isCod ? 1 : 0
+      }'`;
+
+      try {
+        const data = (
+          await axios.get(url, {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          })
+        ).data;
+
+        const couriers = data.data.available_courier_companies.map(
+          (courier: Record<string, unknown>) => ({
+            courier_name: courier.courier_name,
+            cutoff_time: courier.cutoff_time,
+            etd: courier.etd,
+            freight_charge: courier.freight_charge,
+            is_surface: courier.is_surface,
+            rto_charges: courier.rto_charges,
+          })
+        );
+
+        console.log(couriers);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(couriers),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Unable to fetch couriers due to some error`,
+            },
+          ],
+        };
+      }
+    }
+  );
 };
