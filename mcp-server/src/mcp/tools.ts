@@ -14,7 +14,6 @@ export const initializeTools = (server: McpServer) => {
       const srApiDomain = "https://apiv2.shiprocket.in";
 
       const { sellerToken } = connectionsBySessionId[context.sessionId!];
-      console.log(connectionsBySessionId, context);
       const trackUrl = `${srApiDomain}/v1/copilot/order/track/${trackId}`;
       const orderDetailUrl = `${srApiDomain}/v1/copilot/order/show/${trackId}`;
 

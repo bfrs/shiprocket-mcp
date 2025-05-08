@@ -4,8 +4,12 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { ChatOpenAI } from "@langchain/openai";
 import { loadMcpTools } from "@langchain/mcp-adapters";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { MemorySaver } from "@langchain/langgraph";
+import * as crypto from "node:crypto";
 
 const router = express.Router();
+
+const memory = new MemorySaver();
 
 const chatModel = new ChatOpenAI({
   openAIApiKey: process.env.OPENAI_KEY,
@@ -15,7 +19,15 @@ const chatModel = new ChatOpenAI({
 });
 
 router.post("/send", async (req, res) => {
-  const userMessage = req.body.message;
+  let { message: userMessage, session_id: sessionId = null } = req.body as {
+    message: string;
+    session_id: string;
+  };
+
+  if (sessionId === null) {
+    sessionId = crypto.randomUUID();
+  }
+
   const authorization = req.headers.authorization;
   const token = authorization?.split(" ")[1] as string;
   const client = new Client({
@@ -35,14 +47,23 @@ router.post("/send", async (req, res) => {
     additionalToolNamePrefix: "",
   });
 
-  const agent = createReactAgent({ llm: chatModel, tools });
-  const agentResponse = await agent.invoke({
-    messages: [{ role: "user", content: userMessage }],
+  const agent = createReactAgent({
+    llm: chatModel,
+    tools,
+    checkpointer: memory,
   });
+
+  const agentResponse = await agent.invoke(
+    {
+      messages: [{ role: "user", content: userMessage }],
+    },
+    { configurable: { thread_id: sessionId } }
+  );
 
   res.json({
     success: true,
     message: agentResponse.messages.at(-1)?.content,
+    session_id: sessionId,
   });
 
   await client.close();
