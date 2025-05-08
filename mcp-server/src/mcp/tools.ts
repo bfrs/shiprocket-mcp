@@ -97,19 +97,20 @@ export const initializeTools = (server: McpServer) => {
 
   server.tool(
     "rate_calculator",
-    `Given pickup and delivery pincodes, fetch shipping couriers, their prices and EDDs (Estimated Delivery Dates)`,
+    `Given pickup and delivery pincodes, fetch shipping couriers, their prices and EDDs (Estimated Delivery Dates).
+Always ask for all the inputs before calling the tool`,
     {
       pickup_postcode: zod.string(),
       delivery_postcode: zod.string(),
       weight_in_kg: zod.number(),
-      is_cod: zod.boolean(),
+      cod_or_prepaid: zod.string(zod.enum(["COD", "PREPAID"])),
     },
     async (
       {
         pickup_postcode: pickupPincode,
         delivery_postcode: deliveryPostcode,
         weight_in_kg: weight,
-        is_cod: isCod,
+        cod_or_prepaid: codOrPrepaid,
       },
       context
     ) => {
@@ -117,7 +118,7 @@ export const initializeTools = (server: McpServer) => {
 
       const { sellerToken } = connectionsBySessionId[context.sessionId!];
       const url = `${srApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
-        isCod ? 1 : 0
+        codOrPrepaid === "COD" ? 1 : 0
       }'`;
 
       try {
@@ -140,8 +141,6 @@ export const initializeTools = (server: McpServer) => {
             rto_charges: courier.rto_charges,
           })
         );
-
-        console.log(couriers);
 
         return {
           content: [
