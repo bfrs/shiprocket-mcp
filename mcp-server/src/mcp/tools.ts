@@ -137,7 +137,7 @@ Always ask for all the inputs before calling the tool`,
             cutoff_time: courier.cutoff_time,
             etd: courier.etd,
             freight_charge: courier.freight_charge,
-            is_surface: courier.is_surface,
+            transport_mode: courier.is_surface ? "SURFACE" : "AIR",
             rto_charges: courier.rto_charges,
           })
         );
