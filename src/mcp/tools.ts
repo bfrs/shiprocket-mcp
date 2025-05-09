@@ -577,4 +577,87 @@ export const initializeTools = (server: McpServer) => {
       }
     }
   );
+
+  server.tool(
+    "list_pickup_addresses",
+    `Get all the pickup address of the seller
+
+    Returns: List of dictionary representing pickup addresses of seller with following info:
+        pickup_address_id: Number representing pickup address ID
+        pickup_location_nickname: String representing short nickname of pickup location
+        address: String representing pickup address line
+        city: String representing pickup address city
+        state: String representing pickup address state
+        country: String representing pickup address country
+        pincode: 6-digit number representing pickup address pincode`,
+    {},
+    async (args, context) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/v1/settings/company/pickup`;
+
+      try {
+        const data = (
+          await axios.get(url, {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          })
+        ).data;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                data?.data?.shipping_address?.map(
+                  (address: Record<string, unknown>) => ({
+                    pickup_address_id: address.id,
+                    pickup_location_nickname: address.pickup_location,
+                    address: address.address,
+                    city: address.city,
+                    state: address.state,
+                    country: address.country,
+                    pincode: address.pin_code,
+                  })
+                )
+              ),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.log(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to fetch pickup addresses due to some error occurred`,
+              }),
+            },
+          ],
+        };
+      }
+    }
+  );
 };
