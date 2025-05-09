@@ -6,7 +6,21 @@ import { connectionsBySessionId } from "./connections";
 export const initializeTools = (server: McpServer) => {
   server.tool(
     "order_tracker",
-    `This tool provides order tracking related information`,
+    `This tool provides order tracking related information.
+
+    Args:
+        track_id: Alphanumeric tracking ID which can be 'Order Id' or 'AWB number' or 'Channel Order Id'
+    
+    Returns: Dictionary containing following info:
+        orderId: String representing order ID
+        createdOn: Date formatted string representing order creation date
+        orderStatus: String representing order status
+        awbData: Optional dictionary if shipment is assigned to the order, containing following info:
+            number: String representing AWB number of order
+            lastActivity: String representing last marked activity of order
+            lastScanLocation: String representing last marked location of order
+            lastScanTime: Timestamp formatted string representing last order scan timestamp
+            trackingUrl: String representing URL of order tracking page`,
     {
       track_id: zod.string(),
     },
@@ -43,9 +57,10 @@ export const initializeTools = (server: McpServer) => {
           orderId: string;
           createdOn: string;
           orderStatus: string;
+          shipment_id?: string;
           awbData: {
             number: string;
-            lastStatus: string;
+            lastActivity: string;
             lastScanLocation: string;
             lastScanTime: string;
             trackingUrl: string;
@@ -66,7 +81,7 @@ export const initializeTools = (server: McpServer) => {
         } else {
           orderTrackData.awbData = {
             number: orderData.data.data.awb_data.awb as string,
-            lastStatus: trackData.data.tracking_data
+            lastActivity: trackData.data.tracking_data
               .shipment_track_activities[0].activity as string,
             lastScanLocation: trackData.data.tracking_data
               .shipment_track_activities[0].location as string,
@@ -97,8 +112,21 @@ export const initializeTools = (server: McpServer) => {
 
   server.tool(
     "rate_calculator",
-    `Given pickup and delivery pincodes, fetch shipping couriers, their prices and EDDs (Estimated Delivery Dates).
-Always ask for all the inputs before calling the tool`,
+    `Get serviceable shipping couriers, their prices and EDDs (Estimated Delivery Dates).
+    
+    Args:
+        pickup_postcode: String representing pincode of order pickup location
+        delivery_postcode: String representing pincode of order delivery location
+        weight_in_kg: String representing weight of the order package
+        cod_or_prepaid: Enum('COD', 'PREPAID') representing mode of payment of the order
+    
+    Returns: List of dictionary containing following info:
+        courier_name: String representing name of the courier
+        cutoff_time: String representing time deadline for 
+        etd: Date-time formatted string representing expected date & time of delivery
+        freight_charge: Number represeting cost of shipment in Indian Rupees
+        transport_mode: Enum('SURFACE', 'AIR') representing mode of transport
+        rto_charges: Number represeting the cost (in Indian Rupees) associated with return shipment if order gets RTO`,
     {
       pickup_postcode: zod.string(),
       delivery_postcode: zod.string(),
