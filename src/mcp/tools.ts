@@ -2,11 +2,12 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z as zod } from "zod";
 import axios from "axios";
 import { connectionsBySessionId } from "./connections";
+import { AxiosError } from "axios";
 
 export const initializeTools = (server: McpServer) => {
   server.tool(
     "order_tracker",
-    `This tool provides order tracking related information.
+    `Get order tracking related information.
 
     Args:
         track_id: Alphanumeric tracking ID which can be 'Order Id' or 'AWB number' or 'Channel Order Id'
@@ -188,6 +189,388 @@ export const initializeTools = (server: McpServer) => {
             {
               type: "text",
               text: `Unable to fetch couriers due to some error`,
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
+    "ship_order",
+    `Assign courier to ship the order
+
+    Args:
+        shipment_id: Number representing order's shipment ID
+        courier_id: Optional number representing courier ID to assign shipment
+        
+    Returns: Dictionary containing success status and a status message`,
+    {
+      shipment_id: zod.number(),
+      courier_id: zod.number().optional(),
+    },
+    async ({ shipment_id: shipmentId, courier_id: courierId }, context) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/v1/courier/assign/awb`;
+
+      try {
+        const data = (
+          await axios.post(
+            url,
+            {
+              shipment_id: [shipmentId],
+              courier_id: courierId,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${sellerToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        ).data;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: true,
+                message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}`,
+              }),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.log(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to assign courier due to some error occurred`,
+              }),
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
+    "schedule_pickup",
+    `Schedule pickup for the order shipment
+
+    Args:
+        shipment_id: String representing order's shipment ID
+        pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
+        
+    Returns: Dictionary containing success status and a status message`,
+    {
+      shipment_id: zod.number(),
+      pickup_date: zod.string(),
+    },
+    async ({ shipment_id: shipmentId, pickup_date: pickupDate }, context) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/v1/courier/generate/pickup`;
+
+      try {
+        await axios.post(
+          url,
+          {
+            shipment_id: [shipmentId],
+            pickup_date: [pickupDate],
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: true,
+                message: `Shipment's pickup is scheduled on date ${pickupDate}`,
+              }),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.log(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to schedule your pickup due to some error occurred`,
+              }),
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
+    "order_cancel",
+    `Cancel order
+
+    Args:
+        order_id: Number representing order ID
+        cancel_on_channel: Optional boolean representing if the order should also be cancelled on the original channel
+        
+    Returns: Dictionary containing success status and a status message`,
+    {
+      order_id: zod.number(),
+      cancel_on_channel: zod.boolean().default(true),
+    },
+    async (
+      { order_id: orderId, cancel_on_channel: cancelOnChannel },
+      context
+    ) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/v1/orders/cancel`;
+
+      try {
+        await axios.post(
+          url,
+          {
+            ids: [orderId],
+            cancel_on_channel: cancelOnChannel,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: true,
+                message: `Order cancelled successfully`,
+              }),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.log(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to cancel your order due to some error occurred`,
+              }),
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
+    `create_order`,
+    `Create order
+
+    Args:
+        pickup_location: String representing pickup location for the order
+        customer_name: String representing name of the customer who placed order
+        customer_email: String representing email of the customer who placed order
+        customer_phone: 10-digit number representing phone number of the customer who placed order
+        delivery_address: String representing customer address on which order will be delivered
+        delivery_city: String representing city of delivery address
+        delivery_pincode: 6-digit number representing pincode of delivery address
+        delivery_state: String representing state of delivery address
+        delivery_country: String representing country of delivery address
+        length:	Number representing length of the order package in centimeters
+        breadth: Number representing breadth of the order package in centimeters
+        height:	Number representing height of the order package in centimeters
+        weight: Number representing wight of the order package in kilograms
+        mode_of_payment: Enum('COD', 'PREPAID') representing mode of payment for the order
+        order_items: List of dictionary containing following info of each product in the order:
+            name: String representing name of the product item
+            sku: String representing SKU of the product item
+            units: Number representing quantity of product ordered
+            selling_price: Number representing price of product ordered
+
+    Returns: Dictionary containing success status and a status message`,
+    {
+      pickup_location: zod.string(),
+      customer_name: zod.string(),
+      customer_email: zod.string().email(),
+      customer_phone: zod.number(),
+      delivery_address: zod.string(),
+      delivery_city: zod.string(),
+      delivery_pincode: zod.number(),
+      delivery_state: zod.string(),
+      delivery_country: zod.string().default("India"),
+      length: zod.number(),
+      breadth: zod.number(),
+      height: zod.number(),
+      weight: zod.number(),
+      mode_of_payment: zod.string(zod.enum(["COD", "PREPAID"])),
+      order_items: zod.array(
+        zod.object({
+          name: zod.string(),
+          sku: zod.string(),
+          units: zod.number(),
+          selling_price: zod.number(),
+        })
+      ),
+    },
+    async (args, context) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const url = `${srApiDomain}/v1/orders/create/adhoc`;
+
+      try {
+        const data = (
+          await axios.post(
+            url,
+            {
+              order_id: `MCP-${Date.now()}-${Math.floor(Math.random() * 10000)
+                .toString()
+                .padStart(4)}`,
+              order_date: new Date().toLocaleDateString("en-CA"),
+              pickup_location: args.pickup_location,
+              billing_customer_name: args.customer_name,
+              billing_address: args.delivery_address,
+              billing_city: args.delivery_city,
+              billing_pincode: args.delivery_pincode,
+              billing_state: args.delivery_state,
+              billing_country: args.delivery_country,
+              billing_email: args.customer_email,
+              billing_phone: args.customer_phone,
+              shipping_is_billing: true,
+              order_items: args.order_items,
+              payment_method: args.mode_of_payment,
+              sub_total: args.order_items.reduce(
+                (acc, item) => acc + item.selling_price * item.units,
+                0
+              ),
+              length: args.length,
+              breadth: args.breadth,
+              height: args.height,
+              weight: args.weight,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${sellerToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        ).data;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: true,
+                message: `Order created successfully with Order Id: ${data.order_id}`,
+              }),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.log(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.log(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to create your order due to some error occurred`,
+              }),
             },
           ],
         };
