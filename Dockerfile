@@ -16,4 +16,4 @@ COPY --chown=node:node --from=build /usr/src/app/package*.json /usr/src/app/tsco
 RUN npm i --omit=dev --omit=optional
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 COPY --chown=node:node --from=build /usr/src/app/.env ./
-CMD npm start
+CMD npm --silent start

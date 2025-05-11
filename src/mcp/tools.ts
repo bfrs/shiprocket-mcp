@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z as zod } from "zod";
 import axios from "axios";
-import { connectionsBySessionId } from "./connections";
+import { connectionsBySessionId, globalSessionId } from "./connections";
 import { AxiosError } from "axios";
 
 export const initializeTools = (server: McpServer) => {
@@ -28,7 +28,8 @@ export const initializeTools = (server: McpServer) => {
     async ({ track_id: trackId }, context) => {
       const srApiDomain = "https://apiv2.shiprocket.in";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const trackUrl = `${srApiDomain}/v1/copilot/order/track/${trackId}`;
       const orderDetailUrl = `${srApiDomain}/v1/copilot/order/show/${trackId}`;
 
@@ -145,7 +146,8 @@ export const initializeTools = (server: McpServer) => {
     ) => {
       const srApiDomain = "https://serviceability.shiprocket.in";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
         codOrPrepaid === "COD" ? 1 : 0
       }'`;
@@ -181,7 +183,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {
@@ -212,7 +214,8 @@ export const initializeTools = (server: McpServer) => {
     async ({ shipment_id: shipmentId, courier_id: courierId }, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/v1/courier/assign/awb`;
 
       try {
@@ -245,7 +248,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
+          console.error(err.response?.data);
 
           return {
             content: [
@@ -259,7 +262,7 @@ export const initializeTools = (server: McpServer) => {
             ],
           };
         } else if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {
@@ -293,7 +296,8 @@ export const initializeTools = (server: McpServer) => {
     async ({ shipment_id: shipmentId, pickup_date: pickupDate }, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/v1/courier/generate/pickup`;
 
       try {
@@ -324,7 +328,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
+          console.error(err.response?.data);
 
           return {
             content: [
@@ -338,7 +342,7 @@ export const initializeTools = (server: McpServer) => {
             ],
           };
         } else if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {
@@ -375,7 +379,8 @@ export const initializeTools = (server: McpServer) => {
     ) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/v1/orders/cancel`;
 
       try {
@@ -406,7 +411,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
+          console.error(err.response?.data);
 
           return {
             content: [
@@ -420,7 +425,7 @@ export const initializeTools = (server: McpServer) => {
             ],
           };
         } else if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {
@@ -491,7 +496,8 @@ export const initializeTools = (server: McpServer) => {
     async (args, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/v1/orders/create/adhoc`;
 
       try {
@@ -546,7 +552,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
+          console.error(err.response?.data);
 
           return {
             content: [
@@ -560,7 +566,7 @@ export const initializeTools = (server: McpServer) => {
             ],
           };
         } else if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {
@@ -594,7 +600,8 @@ export const initializeTools = (server: McpServer) => {
     async (args, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
-      const { sellerToken } = connectionsBySessionId[context.sessionId!];
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${srApiDomain}/v1/settings/company/pickup`;
 
       try {
@@ -629,7 +636,7 @@ export const initializeTools = (server: McpServer) => {
         };
       } catch (err) {
         if (err instanceof AxiosError) {
-          console.log(err.response?.data);
+          console.error(err.response?.data);
 
           return {
             content: [
@@ -643,7 +650,7 @@ export const initializeTools = (server: McpServer) => {
             ],
           };
         } else if (err instanceof Error) {
-          console.log(err.stack);
+          console.error(err.stack);
         }
 
         return {

@@ -27,7 +27,9 @@ app.get("/sse", async (req, res) => {
 
 app.post("/messages", async (req, res) => {
   const sessionId = req.query.sessionId as string;
-  const { transport } = connectionsBySessionId[sessionId];
+  const { transport } = connectionsBySessionId[sessionId] as {
+    transport: SSEServerTransport;
+  };
 
   if (!transport) {
     res.json({ success: false, message: "No transport found for sessionId" }); //UD: Update structure according to MCP
