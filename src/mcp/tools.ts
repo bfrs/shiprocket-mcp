@@ -448,7 +448,7 @@ export const initializeTools = (server: McpServer) => {
     `Create order
 
     Args:
-        pickup_location: String representing pickup location for the order
+        pickup_location_nickname: String representing short nickname of pickup location
         customer_name: String representing name of the customer who placed order
         customer_email: String representing email of the customer who placed order
         customer_phone: 10-digit number representing phone number of the customer who placed order
@@ -619,8 +619,9 @@ export const initializeTools = (server: McpServer) => {
             {
               type: "text",
               text: JSON.stringify(
-                data?.data?.shipping_address?.map(
-                  (address: Record<string, unknown>) => ({
+                data?.data?.shipping_address
+                  ?.slice(0, 10)
+                  ?.map((address: Record<string, unknown>) => ({
                     pickup_address_id: address.id,
                     pickup_location_nickname: address.pickup_location,
                     address: address.address,
@@ -628,8 +629,7 @@ export const initializeTools = (server: McpServer) => {
                     state: address.state,
                     country: address.country,
                     pincode: address.pin_code,
-                  })
-                )
+                  }))
               ),
             },
           ],
