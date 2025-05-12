@@ -26,7 +26,7 @@ export const initializeTools = (server: McpServer) => {
       track_id: zod.string(),
     },
     async ({ track_id: trackId }, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
+      const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
