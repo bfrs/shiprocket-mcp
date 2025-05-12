@@ -97,9 +97,24 @@ export const initializeTools = (server: McpServer) => {
           content: [{ type: "text", text: JSON.stringify(orderTrackData) }],
         };
       } catch (err) {
-        if (err instanceof Error) {
-          // this.handleAxiosAPIErrorLogging(err);
+        if (err instanceof AxiosError) {
+          console.error(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.error(err.stack);
         }
+
         return {
           content: [
             {
@@ -182,7 +197,21 @@ export const initializeTools = (server: McpServer) => {
           ],
         };
       } catch (err) {
-        if (err instanceof Error) {
+        if (err instanceof AxiosError) {
+          console.error(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
           console.error(err.stack);
         }
 
