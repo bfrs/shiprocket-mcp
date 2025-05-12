@@ -34,16 +34,18 @@ app.get("/sse", async (req, res) => {
 
 app.post("/messages", async (req, res) => {
   const sessionId = req.query.sessionId as string;
-  const { transport } = connectionsBySessionId[sessionId] as {
-    transport: SSEServerTransport;
-  };
+  const connection = connectionsBySessionId[sessionId] as
+    | {
+        transport: SSEServerTransport;
+      }
+    | undefined;
 
-  if (!transport) {
+  if (!connection) {
     res.json({ success: false, message: "No transport found for sessionId" }); //UD: Update structure according to MCP
     return;
   }
 
-  await transport.handlePostMessage(req, res, req.body);
+  await connection.transport.handlePostMessage(req, res, req.body);
 });
 
 app.use((req, res) => {
