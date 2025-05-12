@@ -14,7 +14,7 @@ const transport = new StdioServerTransport();
       throw new Error("Seller email and password is required in ENV");
     }
 
-    const srApiDomain = "https://apiv2.shiprocket.in";
+    const srApiDomain = "https://apiv2.shiprocket.co";
     const url = `${srApiDomain}/v1/auth/login`;
     const data = (
       await axios.post(url, { email: sellerEmail, password: sellerPassword })
