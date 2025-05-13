@@ -33,7 +33,9 @@ export const initializeTools = (server: McpServer) => {
         })
       ).data;
 
-      const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+      //const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+      const pickupPostcode = "110092";
+      console.log(addressList?.data?.shipping_address?.[0], 'complete data', addressList?.data?.shipping_address?.[0]?.pin_code);
 
       const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
 
