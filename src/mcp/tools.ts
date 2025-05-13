@@ -50,6 +50,8 @@ export const initializeTools = (server: McpServer) => {
           })
         ).data;
 
+        console.log(serviceabilityData.data.available_courier_companies[0].etd);
+
         return {
           content: [
             {
