@@ -17,7 +17,7 @@ export const initializeTools = (server: McpServer) => {
     },
     async ({ delivery_pincode: deliveryPostcode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
-      const srApiDomain = "https://apiv2.shiprocket.co";
+      //const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
