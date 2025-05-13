@@ -6,35 +6,35 @@ import { AxiosError } from "axios";
 
 export const initializeTools = (server: McpServer) => {
   server.tool(
-    "estimated_date_of_delivery",
+    "estimated_delivery",
     `Fetch only the Estimated Delivery Date (EDD) for a given destination. Do not ask the exact pincode and use any of that City if not specified
     When to Use:
         Use this tool when a customer simply wants to know how long it will take for a package to arrive, without comparing couriers.
     Args:
         delivery_pincode: Delivery Pincode of the location or City or Area. If an exact pincode is not provided, use any valid pincode from the destination city`,
     {
-      delivery_pincode: zod.number()
+      delivery_pincode: zod.string()
     },
     async ({ delivery_pincode: deliveryPostcode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
-      const srApiDomain = "https://apiv2.shiprocket.co";
+      //const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
 
-      const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
+      // const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
 
-      const addressList = (
-        await axios.get(listAddressUrl, {
-          headers: {
-            Authorization: `Bearer ${sellerToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-      ).data;
+      // const addressList = (
+      //   await axios.get(listAddressUrl, {
+      //     headers: {
+      //       Authorization: `Bearer ${sellerToken}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   })
+      // ).data;
 
-      const pickupPostcode =
-        addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+      const pickupPostcode = "110092";
+        // addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
 
       const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
 
