@@ -13,7 +13,7 @@ export const initializeTools = (server: McpServer) => {
     Args:
         delivery_pincode: Delivery Pincode of the location or City or Area. If an exact pincode is not provided, use any valid pincode from the destination city`,
     {
-      delivery_pincode: zod.string(),
+      delivery_pincode: zod.number()
     },
     async ({ delivery_pincode: deliveryPostcode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
@@ -47,8 +47,6 @@ export const initializeTools = (server: McpServer) => {
             },
           })
         ).data;
-
-        console.log(serviceabilityData.data.available_courier_companies[0].etd);
 
         return {
           content: [
