@@ -17,24 +17,23 @@ export const initializeTools = (server: McpServer) => {
     },
     async ({ delivery_pincode: deliveryPostcode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
-      //const srApiDomain = "https://apiv2.shiprocket.co";
+      const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
 
-      // const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
+      const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
 
-      // const addressList = (
-      //   await axios.get(listAddressUrl, {
-      //     headers: {
-      //       Authorization: `Bearer ${sellerToken}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   })
-      // ).data;
+      const addressList = (
+        await axios.get(listAddressUrl, {
+          headers: {
+            Authorization: `Bearer ${sellerToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+      ).data;
 
-      const pickupPostcode = "110092";
-        // addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+      const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
 
       const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
 
