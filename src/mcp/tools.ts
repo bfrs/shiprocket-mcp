@@ -6,7 +6,93 @@ import { AxiosError } from "axios";
 
 export const initializeTools = (server: McpServer) => {
   server.tool(
-    "order_tracker",
+    "estimated_date_of_delivery",
+    `Get the Estimated Date of Delivery (EDD) for a given city/locality/pincode. If user provides destination city or locality, do not ask user to provide delivery_postcode, instead take any random pincode of that city/locality as delivery_postcode
+    
+    Args:
+        delivery_postcode: String representing pincode of order delivery location.
+    
+    Returns: Dictionary containing following info: 
+        etd: Date-time formatted string representing expected date & time of delivery`,
+    {
+      delivery_postcode: zod.string(),
+    },
+    async ({ delivery_postcode: deliveryPostcode }, context) => {
+      const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
+
+      const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
+
+      const addressList = (
+        await axios.get(listAddressUrl, {
+          headers: {
+            Authorization: `Bearer ${sellerToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+      ).data;
+
+      const pickupPostcode =
+        addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+
+      const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
+
+      try {
+        const serviceabilityData = (
+          await axios.get(serviceabilityUrl, {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          })
+        ).data;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                edd: serviceabilityData.data.available_courier_companies[0].etd,
+              }),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.error(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.error(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Unable to fetch expected date of delivery due to some error`,
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
+    "order_track",
     `Get order tracking related information.
 
     Args:
@@ -128,7 +214,7 @@ export const initializeTools = (server: McpServer) => {
   );
 
   server.tool(
-    "rate_calculator",
+    "shipping_rate_calculator",
     `Get serviceable shipping couriers, their prices and EDDs (Estimated Delivery Dates).
     
     Args:
@@ -228,7 +314,7 @@ export const initializeTools = (server: McpServer) => {
   );
 
   server.tool(
-    "ship_order",
+    "order_ship",
     `Assign courier to ship the order
 
     Args:
@@ -310,7 +396,7 @@ export const initializeTools = (server: McpServer) => {
   );
 
   server.tool(
-    "schedule_pickup",
+    "order_schedule_pickup",
     `Schedule pickup for the order shipment
 
     Args:
@@ -473,7 +559,7 @@ export const initializeTools = (server: McpServer) => {
   );
 
   server.tool(
-    `create_order`,
+    `order_create`,
     `Create order
 
     Args:
