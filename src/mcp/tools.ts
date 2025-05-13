@@ -22,20 +22,20 @@ export const initializeTools = (server: McpServer) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
 
-      const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
+      // const listAddressUrl = `${srApiDomain}/v1/settings/company/pickup?limit=1`;
 
-      const addressList = (
-        await axios.get(listAddressUrl, {
-          headers: {
-            Authorization: `Bearer ${sellerToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-      ).data;
+      // const addressList = (
+      //   await axios.get(listAddressUrl, {
+      //     headers: {
+      //       Authorization: `Bearer ${sellerToken}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   })
+      // ).data;
 
       //const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
       const pickupPostcode = "110092";
-      console.log(addressList?.data?.shipping_address?.[0], 'complete data', addressList?.data?.shipping_address?.[0]?.pin_code);
+      //console.log(addressList?.data?.shipping_address?.[0], 'complete data', addressList?.data?.shipping_address?.[0]?.pin_code);
 
       const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
 
