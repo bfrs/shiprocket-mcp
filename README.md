@@ -15,7 +15,7 @@ It connects to your personal Shiprocket account directly via Email and password.
 ---
 
 ## 🛠️ Prerequisites
-- Node
+- Node.js (version ≥ 22.14.0)
 - Claude Desktop app (or Cursor)
 
 ## 🛠️ Installation
@@ -28,26 +28,30 @@ cd shiprocket-mcp
 
 ### 2. Install Dependencies using the existing package.json
 ```bash
+# Install dependencies
 npm install
+
+# Build the binary
+npm run build
 ```
 
 ### 3. Connect to MCP server
-Copy the below json with the appropriate {{PATH}} values:
+Add the following to your `claude_desktop_config.json` or `mcp.json`
 
 ```bash
 {
  "mcpServers": {
    "shiprocket": {
-     "command": "node", // Run `which node` and place the output here
-     "args": [
-               "--directory",
-               "{{PATH_TO_SRC}}", // cd into the repo, run `pwd` and enter the output here
-               "run",
-               "main.js"
-     ],
+     "command": "npm",
+      "args": [
+        "--prefix",
+        "{{PATH_TO_SRC}}/shiprocket-mcp",
+        "start",
+        "--silent"
+      ]
      "env": {
-       "USER_NAME":"Your Shiprocket Account email"
-       "PASSWORD":"Your Shiprocket Account password"
+       "SELLER_EMAIL":"<Your Shiprocket Email>"
+       "SELLER_PASSWORD":"<Your Shiprocket password>"
      }
    }
  }
@@ -68,13 +72,19 @@ Open Claude Desktop and you should now see ``Shiprocket`` as an available integr
 Or restart Cursor.
 
 ## MCP Tools
-Claude can access the following tools to interact with Shiprocket:
+Clients (Claude or Cursor) can access the following tools to interact with Shiprocket:
 
-- `shipping_rate_calculator` - To check shipping rates and coverage
-- `order_track` - Search for contacts by name or phone number
-- `order_ship` - Ship an order
-- `order_cancel` - Cancel an order by pxroving order ID
+- `estimated_date_of_delivery` - To know more about the date of delivery for any location.
+- `shipping_rate_calculator` - To check shippable couriers with their rates and coverage.
+- `order_track` - Track any order to know more about the current status of the order. 
+- `order_ship` - Ship an order to any serviceable courier partner based on the configured rules or specifying names.
+- `order_pickup_schedule` - Schedule pickup of an order for pickup.
+- `order_cancel` - Cancel an order by providing order ID
+- `order_create` - Create an order
+- `list_pickup_addresses` - List all the configured pickup addresses.
 
-## Example Queries:
-- "Show me fastest serviceable courier from Delhi to Banglore"
-- "Help me to track my order for Order 928938367"
+## Examples:
+- "Show me the fastest serviceable courier from Delhi to Banglore"
+- "What are the courier options and delivery times from Delhi to Bangalore for a 0.5 KG COD package?"
+- "Where is my order?"
+- "How long will it take to deliver a package to Mumbai?"
