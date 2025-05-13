@@ -7,10 +7,11 @@ import { AxiosError } from "axios";
 export const initializeTools = (server: McpServer) => {
   server.tool(
     "estimated_date_of_delivery",
-    `Get the Estimated Date of Delivery (EDD) for a given city/locality/pincode. If user provides destination city or locality, do not ask user to provide delivery_postcode, instead take any random pincode of that city/locality as delivery_postcode
-    
+    `Fetch only the Estimated Delivery Date (EDD) for a given destination. Do not ask the exact pincode and use any of that City if not specified
+    When to Use:
+        Use this tool when a customer simply wants to know how long it will take for a package to arrive, without comparing couriers.
     Args:
-        delivery_postcode: String representing pincode of order delivery location.
+        delivery_postcode: Delivery Pincode of the location or City or Area. If an exact pincode is not provided, use any valid pincode from the destination city
     
     Returns: Dictionary containing following info: 
         etd: Date-time formatted string representing expected date & time of delivery`,
