@@ -11,14 +11,11 @@ export const initializeTools = (server: McpServer) => {
     When to Use:
         Use this tool when a customer simply wants to know how long it will take for a package to arrive, without comparing couriers.
     Args:
-        delivery_postcode: Delivery Pincode of the location or City or Area. If an exact pincode is not provided, use any valid pincode from the destination city
-    
-    Returns: Dictionary containing following info: 
-        etd: Date-time formatted string representing expected date & time of delivery`,
+        delivery_pincode: Delivery Pincode of the location or City or Area. If an exact pincode is not provided, use any valid pincode from the destination city`,
     {
-      delivery_postcode: zod.string(),
+      delivery_pincode: zod.string(),
     },
-    async ({ delivery_postcode: deliveryPostcode }, context) => {
+    async ({ delivery_pincode: deliveryPostcode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
       const srApiDomain = "https://apiv2.shiprocket.co";
 
