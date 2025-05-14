@@ -287,32 +287,34 @@ export const initializeTools = (server: McpServer) => {
           })
         ).data;
 
-        const structuredOrders = data.map((order: Record<string, unknown>) => ({
-          order_id: order.id,
-          channel_name: order.channel_name,
-          channel_order_id: order.channel_order_id,
-          customer_name: order.customer_name,
-          order_total_cost: order.total,
-          status: order.status,
-          order_created_at: order.channel_created_at,
-          products: Array.isArray(order.products)
-            ? order.products.map((product: Record<string, unknown>) => ({
-                name: product.name,
-                product_sku: product.channel_sku,
-                quantity: product.quantity,
-              }))
-            : [],
-          shipment_id: Array.isArray(order.shipments)
-            ? order.shipments?.[0]?.id
-            : null,
-          shipping_courier_name: Array.isArray(order.shipments)
-            ? order.shipments?.[0]?.courier
-            : null,
-          awb_number: Array.isArray(order.shipments)
-            ? order.shipments?.[0]?.awb
-            : null,
-          payment_mode: order.cod === 1 ? "COD" : "PREPAID",
-        }));
+        const structuredOrders = data?.data?.map(
+          (order: Record<string, unknown>) => ({
+            order_id: order.id,
+            channel_name: order.channel_name,
+            channel_order_id: order.channel_order_id,
+            customer_name: order.customer_name,
+            order_total_cost: order.total,
+            status: order.status,
+            order_created_at: order.channel_created_at,
+            products: Array.isArray(order.products)
+              ? order.products.map((product: Record<string, unknown>) => ({
+                  name: product.name,
+                  product_sku: product.channel_sku,
+                  quantity: product.quantity,
+                }))
+              : [],
+            shipment_id: Array.isArray(order.shipments)
+              ? order.shipments?.[0]?.id
+              : null,
+            shipping_courier_name: Array.isArray(order.shipments)
+              ? order.shipments?.[0]?.courier
+              : null,
+            awb_number: Array.isArray(order.shipments)
+              ? order.shipments?.[0]?.awb
+              : null,
+            payment_mode: order.cod === 1 ? "COD" : "PREPAID",
+          })
+        );
 
         return {
           content: [
