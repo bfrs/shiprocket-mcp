@@ -461,15 +461,15 @@ export const initializeTools = (server: McpServer) => {
     `Assign courier to ship the order
 
     Args:
-        shipment_id: Number representing order's shipment ID
+        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
         courier_id: Optional number representing courier ID to assign shipment
         
     Returns: Dictionary containing success status and a status message`,
     {
-      shipment_id: zod.number(),
+      order_id: zod.string(),
       courier_id: zod.number().optional(),
     },
-    async ({ shipment_id: shipmentId, courier_id: courierId }, context) => {
+    async ({ order_id: orderId, courier_id: courierId }, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
@@ -481,7 +481,7 @@ export const initializeTools = (server: McpServer) => {
           await axios.post(
             url,
             {
-              shipment_id: [shipmentId],
+              oid: orderId,
               courier_id: courierId,
             },
             {
@@ -543,15 +543,15 @@ export const initializeTools = (server: McpServer) => {
     `Schedule pickup for the order shipment
 
     Args:
-        shipment_id: String representing order's shipment ID
+        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
         pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
-        
+
     Returns: Dictionary containing success status and a status message`,
     {
-      shipment_id: zod.number(),
+      order_id: zod.string(),
       pickup_date: zod.string(),
     },
-    async ({ shipment_id: shipmentId, pickup_date: pickupDate }, context) => {
+    async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
       const srApiDomain = "https://apiv2.shiprocket.co";
 
       const { sellerToken } =
@@ -562,7 +562,7 @@ export const initializeTools = (server: McpServer) => {
         await axios.post(
           url,
           {
-            shipment_id: [shipmentId],
+            shipment_id: orderId,
             pickup_date: [pickupDate],
           },
           {
