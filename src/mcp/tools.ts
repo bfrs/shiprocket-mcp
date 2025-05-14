@@ -53,6 +53,7 @@ export const initializeTools = (server: McpServer) => {
               type: "text",
               text: JSON.stringify({
                 date_of_delivery: serviceabilityData.data.available_courier_companies[0].etd,
+                "delivery_pincode": deliveryPostcode
               }),
             },
           ],
