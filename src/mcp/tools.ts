@@ -34,7 +34,7 @@ export const initializeTools = (server: McpServer) => {
       // ).data;
 
       //const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
-      
+
       const pickupPostcode = "110092";
 
       const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
@@ -54,7 +54,7 @@ export const initializeTools = (server: McpServer) => {
             {
               type: "text",
               text: JSON.stringify({
-                edd: serviceabilityData.data.available_courier_companies[0].etd,
+                date_of_delivery: serviceabilityData.data.available_courier_companies[0].etd,
               }),
             },
           ],
