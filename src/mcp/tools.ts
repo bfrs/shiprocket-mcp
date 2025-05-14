@@ -7,15 +7,18 @@ import { AxiosError } from "axios";
 export const initializeTools = (server: McpServer) => {
   server.tool(
     "estimated_delivery",
-    `Fetch only the Estimated Delivery Date (EDD) for a given destination.
-    When to Use:
-        Use this tool when a customer simply wants to know how long it will take for a package to arrive, without comparing couriers.
+    `Get the Estimated Date of Delivery (EDD) for a given destination.
+    
     Args:
-        delivery_pincode: Delivery Pincode of the location or City or Area.`,
+        delivery_pincode: String representing pincode of order delivery destination
+    
+    Returns: Dictionary containing following info: 
+        estimated_delivery_date: Date-time formatted string representing expected date & time of delivery
+        delivery_pincode: String representing pincode of order delivery destination`,
     {
-      delivery_pincode: zod.string()
+      delivery_pincode: zod.string(),
     },
-    async ({ delivery_pincode: deliveryPostcode }, context) => {
+    async ({ delivery_pincode: deliveryPincode }, context) => {
       const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
       const srApiDomain = "https://apiv2.shiprocket.co";
 
@@ -33,9 +36,10 @@ export const initializeTools = (server: McpServer) => {
         })
       ).data;
 
-      const pickupPostcode = addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
+      const pickupPostcode =
+        addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
 
-      const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=0.5&cod=0'`;
+      const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPincode}&weight=0.5&cod=0'`;
 
       try {
         const serviceabilityData = (
@@ -52,8 +56,9 @@ export const initializeTools = (server: McpServer) => {
             {
               type: "text",
               text: JSON.stringify({
-                date_of_delivery: serviceabilityData.data.available_courier_companies[0].etd,
-                "delivery_pincode": deliveryPostcode
+                estimated_delivery_date:
+                  serviceabilityData.data.available_courier_companies[0].etd,
+                delivery_pincode: deliveryPincode,
               }),
             },
           ],
