@@ -48,9 +48,9 @@ Add the following to your `claude_desktop_config.json` or `mcp.json`
         "{{PATH_TO_SRC}}/shiprocket-mcp",
         "start",
         "--silent"
-      ]
+      ],
      "env": {
-       "SELLER_EMAIL":"<Your Shiprocket Email>"
+       "SELLER_EMAIL":"<Your Shiprocket Email>",
        "SELLER_PASSWORD":"<Your Shiprocket password>"
      }
    }
