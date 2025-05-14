@@ -217,6 +217,146 @@ export const initializeTools = (server: McpServer) => {
   );
 
   server.tool(
+    "order_list",
+    `Get list of orders
+    
+    Args:
+        status: Optional ENUM('NEW', 'READY_TO_SHIP', 'IN_TRANSIT', 'DELIVERED') representing status filter for orders
+        
+    Return: List of dictionary containing following info:
+        `,
+    {
+      status: zod
+        .string(
+          zod.enum([
+            "CANCELLED",
+            "NEW",
+            "READY_TO_SHIP",
+            "IN_TRANSIT",
+            "DELIVERED",
+            "RTO",
+          ])
+        )
+        .optional(),
+    },
+    async ({ status }, context) => {
+      const srApiDomain = "https://apiv2.shiprocket.co";
+
+      let concatenatedStatusIds = "";
+
+      switch (status) {
+        case "NEW": {
+          concatenatedStatusIds = "1";
+          break;
+        }
+        case "CANCELLED": {
+          concatenatedStatusIds = "5,18";
+          break;
+        }
+        case "READY_TO_SHIP": {
+          concatenatedStatusIds = "34,14,35,12,13,3,4";
+          break;
+        }
+        case "IN_TRANSIT": {
+          concatenatedStatusIds = "37,20,44,19,51,43,6";
+          break;
+        }
+        case "DELIVERED": {
+          concatenatedStatusIds = "7";
+          break;
+        }
+        case "RTO": {
+          concatenatedStatusIds = "15,55,46,45,16,17,36,87,85";
+          break;
+        }
+      }
+
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const url = `${srApiDomain}/v1/orders/track${
+        status ? `?filter=${concatenatedStatusIds}&filter_by=status` : ""
+      }`;
+
+      try {
+        const data = (
+          await axios.get(url, {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          })
+        ).data;
+
+        const structuredOrders = data.map((order: Record<string, unknown>) => ({
+          order_id: order.id,
+          channel_name: order.channel_name,
+          channel_order_id: order.channel_order_id,
+          customer_name: order.customer_name,
+          order_total_cost: order.total,
+          status: order.status,
+          order_created_at: order.channel_created_at,
+          products: Array.isArray(order.products)
+            ? order.products.map((product: Record<string, unknown>) => ({
+                name: product.name,
+                product_sku: product.channel_sku,
+                quantity: product.quantity,
+              }))
+            : [],
+          shipment_id: Array.isArray(order.shipments)
+            ? order.shipments?.[0]?.id
+            : null,
+          shipping_courier_name: Array.isArray(order.shipments)
+            ? order.shipments?.[0]?.courier
+            : null,
+          awb_number: Array.isArray(order.shipments)
+            ? order.shipments?.[0]?.awb
+            : null,
+          payment_mode: order.cod === 1 ? "COD" : "PREPAID",
+        }));
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(structuredOrders),
+            },
+          ],
+        };
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          console.error(err.response?.data);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: err.response?.data,
+                }),
+              },
+            ],
+          };
+        } else if (err instanceof Error) {
+          console.error(err.stack);
+        }
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                success: false,
+                message: `Unable to fetch orders due to some error occurred`,
+              }),
+            },
+          ],
+        };
+      }
+    }
+  );
+
+  server.tool(
     "shipping_rate_calculator",
     `Get serviceable shipping couriers, their prices and EDDs (Estimated Delivery Dates).
     
