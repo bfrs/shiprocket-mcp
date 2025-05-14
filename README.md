@@ -45,11 +45,11 @@ Add the following to your `claude_desktop_config.json` or `mcp.json`
      "command": "npm",
       "args": [
         "--prefix",
-        "{{PATH_TO_SRC}}/shiprocket-mcp",
+        "{{PATH_TO_SRC}}",
         "start",
         "--silent"
       ],
-     "env": {
+      "env": {
        "SELLER_EMAIL":"<Your Shiprocket Email>",
        "SELLER_PASSWORD":"<Your Shiprocket password>"
      }
