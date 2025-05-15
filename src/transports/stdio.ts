@@ -1,3 +1,4 @@
+import { API_DOMAINS } from "@/config";
 import { connectionsBySessionId, globalSessionId } from "@/mcp/connections";
 import { mcpServer } from "@/mcp/index";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -14,8 +15,7 @@ const transport = new StdioServerTransport();
       throw new Error("Seller email and password is required in ENV");
     }
 
-    const srApiDomain = "https://apiv2.shiprocket.in";
-    const url = `${srApiDomain}/v1/external/auth/login`;
+    const url = `${API_DOMAINS.SHIPROCKET}/v1/external/auth/login`;
     const data = (
       await axios.post(url, { email: sellerEmail, password: sellerPassword })
     ).data;

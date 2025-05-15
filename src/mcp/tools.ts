@@ -3,6 +3,7 @@ import { z as zod } from "zod";
 import axios from "axios";
 import { connectionsBySessionId, globalSessionId } from "./connections";
 import { AxiosError } from "axios";
+import { API_DOMAINS } from "@/config";
 
 export const initializeTools = (server: McpServer) => {
   server.tool(
@@ -19,13 +20,10 @@ export const initializeTools = (server: McpServer) => {
       delivery_pincode: zod.string(),
     },
     async ({ delivery_pincode: deliveryPincode }, context) => {
-      const srServiceabilityApiDomain = "https://serviceability.shiprocket.in";
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
 
-      const listAddressUrl = `${srApiDomain}/v1/external/settings/company/pickup?limit=1`;
+      const listAddressUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?limit=1`;
 
       const addressList = (
         await axios.get(listAddressUrl, {
@@ -39,7 +37,7 @@ export const initializeTools = (server: McpServer) => {
       const pickupPostcode =
         addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
 
-      const serviceabilityUrl = `${srServiceabilityApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPincode}&weight=0.5&cod=0'`;
+      const serviceabilityUrl = `${API_DOMAINS.SERVICEABILITY}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPincode}&weight=0.5&cod=0'`;
 
       try {
         const serviceabilityData = (
@@ -115,12 +113,10 @@ export const initializeTools = (server: McpServer) => {
       track_id: zod.string(),
     },
     async ({ track_id: trackId }, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const trackUrl = `${srApiDomain}/v1/external/copilot/order/track/${trackId}`;
-      const orderDetailUrl = `${srApiDomain}/v1/external/copilot/order/show/${trackId}`;
+      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/track/${trackId}`;
+      const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/show/${trackId}`;
 
       try {
         const apiCalls: Promise<Record<string, any>>[] = [];
@@ -240,8 +236,6 @@ export const initializeTools = (server: McpServer) => {
         .optional(),
     },
     async ({ status }, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       let concatenatedStatusIds = "";
 
       switch (status) {
@@ -273,7 +267,7 @@ export const initializeTools = (server: McpServer) => {
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/orders/track${
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/track${
         status ? `?filter=${concatenatedStatusIds}&filter_by=status` : ""
       }`;
 
@@ -390,11 +384,11 @@ export const initializeTools = (server: McpServer) => {
       },
       context
     ) => {
-      const srApiDomain = "https://serviceability.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
+      const url = `${
+        API_DOMAINS.SERVICEABILITY
+      }/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
         codOrPrepaid === "COD" ? 1 : 0
       }'`;
 
@@ -472,11 +466,9 @@ export const initializeTools = (server: McpServer) => {
       courier_id: zod.number().optional(),
     },
     async ({ order_id: orderId, courier_id: courierId }, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/courier/assign/awb`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/assign/awb`;
 
       try {
         const data = (
@@ -554,11 +546,9 @@ export const initializeTools = (server: McpServer) => {
       pickup_date: zod.string(),
     },
     async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/courier/generate/pickup`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/pickup`;
 
       try {
         await axios.post(
@@ -637,11 +627,9 @@ export const initializeTools = (server: McpServer) => {
       { order_id: orderId, cancel_on_channel: cancelOnChannel },
       context
     ) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/orders/cancel`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/cancel`;
 
       try {
         await axios.post(
@@ -754,11 +742,9 @@ export const initializeTools = (server: McpServer) => {
       ),
     },
     async (args, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/orders/create/adhoc`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/create/adhoc`;
 
       try {
         const data = (
@@ -858,11 +844,9 @@ export const initializeTools = (server: McpServer) => {
         pincode: 6-digit number representing pickup address pincode`,
     {},
     async (args, context) => {
-      const srApiDomain = "https://apiv2.shiprocket.in";
-
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${srApiDomain}/v1/external/settings/company/pickup`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup`;
 
       try {
         const data = (
