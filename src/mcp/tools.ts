@@ -115,8 +115,8 @@ export const initializeTools = (server: McpServer) => {
     async ({ track_id: trackId }, context) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/track/${trackId}`;
-      const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/show/${trackId}`;
+      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/mcp/order/track/${trackId}`;
+      const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/mcp/order/show/${trackId}`;
 
       try {
         const apiCalls: Promise<Record<string, any>>[] = [];
