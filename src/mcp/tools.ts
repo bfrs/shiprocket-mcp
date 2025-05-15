@@ -97,89 +97,64 @@ export const initializeTools = (server: McpServer) => {
     `Get order tracking related information.
 
     Args:
-        track_id: Alphanumeric tracking ID which can be 'Order Id' or 'AWB number' or 'Channel Order Id'
+        awb_number: String representing AWB number assigned to the order
     
     Returns: Dictionary containing following info:
-        orderId: String representing order ID
-        createdOn: Date formatted string representing order creation date
-        orderStatus: String representing order status
-        awbData: Optional dictionary if shipment is assigned to the order, containing following info:
-            number: String representing AWB number of order
-            lastActivity: String representing last marked activity of order
-            lastScanLocation: String representing last marked location of order
-            lastScanTime: Timestamp formatted string representing last order scan timestamp
-            trackingUrl: String representing URL of order tracking page`,
+        order_status: String representing order status
+        awb_number: String representing AWB number of order
+        last_activity: String representing last marked activity of order
+        last_scan_location: String representing last marked location of order
+        last_scan_time: Timestamp formatted string representing last order scan timestamp
+        tracking_url: String representing URL of order tracking page`,
     {
-      track_id: zod.string(),
+      awb_number: zod.string(),
     },
-    async ({ track_id: trackId }, context) => {
+    async ({ awb_number: awbNumber }, context) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/track/${trackId}`;
-      const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/copilot/order/show/${trackId}`;
+      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/track/awb/${awbNumber}`;
 
       try {
-        const apiCalls: Promise<Record<string, any>>[] = [];
-
-        apiCalls.push(
-          axios.get(trackUrl, {
+        const trackData = (
+          await axios.get(trackUrl, {
             headers: {
               Authorization: `Bearer ${sellerToken}`,
               "Content-Type": "application/json",
             },
           })
-        );
+        ).data?.tracking_data;
 
-        apiCalls.push(
-          axios.get(orderDetailUrl, {
-            headers: {
-              Authorization: `Bearer ${sellerToken}`,
-              "Content-Type": "application/json",
-            },
-          })
-        );
-        const [trackData, orderData] = await Promise.all(apiCalls);
-
-        const orderTrackData: {
-          orderId: string;
-          createdOn: string;
-          orderStatus: string;
-          shipment_id?: string;
-          awbData: {
-            number: string;
-            lastActivity: string;
-            lastScanLocation: string;
-            lastScanTime: string;
-            trackingUrl: string;
-          } | null;
-        } = {
-          orderId: orderData.data.data.id as string,
-          createdOn: orderData.data.data.created_at as string,
-          orderStatus: orderData.data.data.status as string,
-          awbData: null,
-        };
-
-        if (
-          trackData.data.tracking_data.track_status === 0 ||
-          !("shipment_track_activities" in trackData.data.tracking_data) ||
-          !Array.isArray(trackData.data.tracking_data.shipment_track_activities)
-        ) {
-          orderTrackData.awbData = null;
-        } else {
-          orderTrackData.awbData = {
-            number: orderData.data.data.awb_data.awb as string,
-            lastActivity: trackData.data.tracking_data
-              .shipment_track_activities[0].activity as string,
-            lastScanLocation: trackData.data.tracking_data
-              .shipment_track_activities[0].location as string,
-            lastScanTime: trackData.data.tracking_data
-              .shipment_track_activities[0].date as string,
-            trackingUrl: trackData.data.tracking_data.track_url as string,
+        if ("error" in trackData && trackData.error) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify({
+                  success: false,
+                  error: trackData.error,
+                }),
+              },
+            ],
           };
         }
 
         return {
-          content: [{ type: "text", text: JSON.stringify(orderTrackData) }],
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                number: awbNumber,
+                order_status: trackData.shipment_track[0].current_status,
+                last_activity:
+                  trackData?.shipment_track_activities?.[0]?.activity ?? null,
+                last_scan_location:
+                  trackData?.shipment_track_activities?.[0]?.location ?? null,
+                last_scan_time:
+                  trackData?.shipment_track_activities?.[0]?.date ?? null,
+                tracking_url: trackData?.track_url,
+              }),
+            },
+          ],
         };
       } catch (err) {
         if (err instanceof AxiosError) {
@@ -538,16 +513,15 @@ export const initializeTools = (server: McpServer) => {
     `Schedule pickup for the order shipment
 
     Args:
-        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
+        shipment_id: Number representing Shipment ID of the order
         pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
 
     Returns: Dictionary containing success status and a status message`,
     {
-      order_id: zod.string().min(1),
+      shipment_id: zod.number(),
       pickup_date: zod.string(),
     },
-    async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
-      orderId = orderId.trim();
+    async ({ shipment_id: shipmentId, pickup_date: pickupDate }, context) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/pickup`;
@@ -556,7 +530,7 @@ export const initializeTools = (server: McpServer) => {
         await axios.post(
           url,
           {
-            oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
+            shipment_id: shipmentId,
             pickup_date: [pickupDate],
           },
           {
