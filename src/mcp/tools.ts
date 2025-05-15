@@ -462,10 +462,11 @@ export const initializeTools = (server: McpServer) => {
         
     Returns: Dictionary containing success status and a status message`,
     {
-      order_id: zod.string(),
+      order_id: zod.string().min(1),
       courier_id: zod.number().optional(),
     },
     async ({ order_id: orderId, courier_id: courierId }, context) => {
+      orderId = orderId.trim();
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/assign/awb`;
@@ -475,7 +476,7 @@ export const initializeTools = (server: McpServer) => {
           await axios.post(
             url,
             {
-              oid: orderId,
+              oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
               courier_id: courierId,
             },
             {
@@ -542,10 +543,11 @@ export const initializeTools = (server: McpServer) => {
 
     Returns: Dictionary containing success status and a status message`,
     {
-      order_id: zod.string(),
+      order_id: zod.string().min(1),
       pickup_date: zod.string(),
     },
     async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
+      orderId = orderId.trim();
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/pickup`;
@@ -554,7 +556,7 @@ export const initializeTools = (server: McpServer) => {
         await axios.post(
           url,
           {
-            shipment_id: orderId,
+            oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
             pickup_date: [pickupDate],
           },
           {
