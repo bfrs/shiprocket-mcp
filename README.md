@@ -15,7 +15,7 @@ It connects to your personal Shiprocket account directly via Email and password.
 ---
 
 ## 🛠️ Prerequisites
-- Node.js (version ≥ 22.14.0)
+- Node.js (version > 20.0.0 and < 23.0.0)
 - Claude Desktop app (or Cursor)
 
 ## 🛠️ Installation
