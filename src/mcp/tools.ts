@@ -895,14 +895,30 @@ export const initializeTools = (server: McpServer) => {
     Returns:
         file_url: String representing URL of generated label`,
     { shipment_id: zod.number() },
-    async (args, context) => {
+    async ({ shipment_id: shipmentId }, context) => {
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
+
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/label`;
+      const data = (
+        await axios.post(
+          url,
+          { shipment_id: shipmentId },
+          {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      ).data;
+
       return {
         content: [
           {
             type: "text",
             text: JSON.stringify({
-              file_url:
-                "https://shiprocket-db-mum.s3.ap-south-1.amazonaws.com/pdfs/label_25149_0196d88b-8506-7917-a48f-a9f42c4a2e93.pdf",
+              file_url: data.label_url,
             }),
           },
         ],
