@@ -903,7 +903,7 @@ export const initializeTools = (server: McpServer) => {
       const data = (
         await axios.post(
           url,
-          { shipment_id: shipmentId },
+          { shipment_id: [shipmentId] },
           {
             headers: {
               Authorization: `Bearer ${sellerToken}`,
