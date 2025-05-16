@@ -513,15 +513,16 @@ export const initializeTools = (server: McpServer) => {
     `Schedule pickup for the order shipment
 
     Args:
-        shipment_id: Number representing Shipment ID of the order
+        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
         pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
 
     Returns: Dictionary containing success status and a status message`,
     {
-      shipment_id: zod.number(),
+      order_id: zod.string().min(1),
       pickup_date: zod.string(),
     },
-    async ({ shipment_id: shipmentId, pickup_date: pickupDate }, context) => {
+    async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
+      orderId = orderId.trim();
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/pickup`;
@@ -530,7 +531,7 @@ export const initializeTools = (server: McpServer) => {
         await axios.post(
           url,
           {
-            shipment_id: shipmentId,
+            oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
             pickup_date: [pickupDate],
           },
           {
@@ -887,4 +888,43 @@ export const initializeTools = (server: McpServer) => {
       }
     }
   );
+
+  server.tool(
+    "generate_shipment_label",
+    `Generate shipment label and get the link of generated label as PDF file
+
+    Returns:
+        file_url: String representing URL of generated label`,
+    { shipment_id: zod.number() },
+    async ({ shipment_id: shipmentId }, context) => {
+      const { sellerToken } =
+        connectionsBySessionId[context.sessionId ?? globalSessionId];
+
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/label`;
+      const data = (
+        await axios.post(
+          url,
+          { shipment_id: [shipmentId]},
+          {
+            headers: {
+              Authorization: `Bearer ${sellerToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      ).data;
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({
+              file_url: data.label_url,
+            }),
+          },
+        ],
+      };
+    }
+  );
+
 };
