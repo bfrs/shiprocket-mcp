@@ -242,8 +242,10 @@ export const initializeTools = (server: McpServer) => {
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders${
-        status ? `?filter=${concatenatedStatusIds}&filter_by=status&medium=shiprocketMCP` : "?medium=shiprocketMCP"
+      const url = `${
+        API_DOMAINS.SHIPROCKET
+      }/v1/external/orders?medium=shiprocketMCP${
+        status ? `&filter=${concatenatedStatusIds}&filter_by=status` : ""
       }`;
 
       try {
@@ -533,7 +535,7 @@ export const initializeTools = (server: McpServer) => {
           {
             oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
             pickup_date: [pickupDate],
-            medium: "shiprocketMCP"
+            medium: "shiprocketMCP",
           },
           {
             headers: {
@@ -615,7 +617,7 @@ export const initializeTools = (server: McpServer) => {
           {
             ids: [orderId],
             cancel_on_channel: cancelOnChannel,
-            medium: "shiprocketMCP"
+            medium: "shiprocketMCP",
           },
           {
             headers: {
@@ -908,7 +910,7 @@ export const initializeTools = (server: McpServer) => {
           url,
           {
             shipment_id: [shipmentId],
-            medium: "shiprocketMCP"
+            medium: "shiprocketMCP",
           },
           {
             headers: {
@@ -931,5 +933,4 @@ export const initializeTools = (server: McpServer) => {
       };
     }
   );
-
 };
