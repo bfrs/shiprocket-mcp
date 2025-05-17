@@ -41,7 +41,7 @@ Add the following to your `claude_desktop_config.json` or `mcp.json`
 ```bash
 {
  "mcpServers": {
-   "shiprocket": {
+   "Shiprocket": {
      "command": "npm",
       "args": [
         "--prefix",
@@ -80,9 +80,11 @@ Clients (Claude or Cursor) can access the following tools to interact with Shipr
 - `order_list` - Fetch recently created orders 
 - `order_track` - Track any order to know more about the current status of the order. 
 - `order_ship` - Ship an order to any serviceable courier partner based on the configured rules or specifying names.
-- `order_pickup_schedule` - Schedule pickup of an order for pickup.
+- `order_pickup_schedule` - Schedule pickup of an order
+- `generate_shipment_label` - Generate label of an order or shipment
 - `order_cancel` - Cancel an order by providing order ID
 - `order_create` - Create an order
+
 
 ## Examples:
 - "Show me the fastest serviceable courier from Delhi to Banglore"
