@@ -23,7 +23,7 @@ export const initializeTools = (server: McpServer) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
 
-      const listAddressUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?limit=1`;
+      const listAddressUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?limit=1&medium=shiprocketMCP`;
 
       const addressList = (
         await axios.get(listAddressUrl, {
@@ -37,7 +37,7 @@ export const initializeTools = (server: McpServer) => {
       const pickupPostcode =
         addressList?.data?.shipping_address?.[0]?.pin_code ?? "110092";
 
-      const serviceabilityUrl = `${API_DOMAINS.SERVICEABILITY}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPincode}&weight=0.5&cod=0'`;
+      const serviceabilityUrl = `${API_DOMAINS.SERVICEABILITY}/courier/ratingserviceability?pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPincode}&weight=0.5&cod=0&medium=shiprocketMCP`;
 
       try {
         const serviceabilityData = (
@@ -112,7 +112,7 @@ export const initializeTools = (server: McpServer) => {
     async ({ awb_number: awbNumber }, context) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/track/awb/${awbNumber}`;
+      const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/track/awb/${awbNumber}?medium=shiprocketMCP`;
 
       try {
         const trackData = (
@@ -242,8 +242,8 @@ export const initializeTools = (server: McpServer) => {
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/track${
-        status ? `?filter=${concatenatedStatusIds}&filter_by=status` : ""
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders${
+        status ? `?filter=${concatenatedStatusIds}&filter_by=status&medium=shiprocketMCP` : "?medium=shiprocketMCP"
       }`;
 
       try {
@@ -363,7 +363,7 @@ export const initializeTools = (server: McpServer) => {
         connectionsBySessionId[context.sessionId ?? globalSessionId];
       const url = `${
         API_DOMAINS.SERVICEABILITY
-      }/courier/ratingserviceability?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
+      }/courier/ratingserviceability?medium=shiprocketMCP&pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
         codOrPrepaid === "COD" ? 1 : 0
       }'`;
 
@@ -533,6 +533,7 @@ export const initializeTools = (server: McpServer) => {
           {
             oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
             pickup_date: [pickupDate],
+            medium: "shiprocketMCP"
           },
           {
             headers: {
@@ -614,6 +615,7 @@ export const initializeTools = (server: McpServer) => {
           {
             ids: [orderId],
             cancel_on_channel: cancelOnChannel,
+            medium: "shiprocketMCP"
           },
           {
             headers: {
@@ -823,7 +825,7 @@ export const initializeTools = (server: McpServer) => {
     async (args, context) => {
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup`;
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?medium=shiprocketMCP`;
 
       try {
         const data = (
@@ -904,7 +906,10 @@ export const initializeTools = (server: McpServer) => {
       const data = (
         await axios.post(
           url,
-          { shipment_id: [shipmentId]},
+          {
+            shipment_id: [shipmentId],
+            medium: "shiprocketMCP"
+          },
           {
             headers: {
               Authorization: `Bearer ${sellerToken}`,
