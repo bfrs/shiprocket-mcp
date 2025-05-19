@@ -367,7 +367,7 @@ export const initializeTools = (server: McpServer) => {
         API_DOMAINS.SERVICEABILITY
       }/courier/ratingserviceability?medium=shiprocketMCP&pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
         codOrPrepaid === "COD" ? 1 : 0
-      }'`;
+      }`;
 
       try {
         const data = (
@@ -455,6 +455,7 @@ export const initializeTools = (server: McpServer) => {
             {
               oid: isNaN(Number(orderId)) ? orderId : parseInt(orderId),
               courier_id: courierId,
+              medium: "shiprocketMCP",
             },
             {
               headers: {
@@ -756,6 +757,7 @@ export const initializeTools = (server: McpServer) => {
               breadth: args.breadth,
               height: args.height,
               weight: args.weight,
+              medium: "shiprocketMCP",
             },
             {
               headers: {
