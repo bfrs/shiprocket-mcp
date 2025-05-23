@@ -1,5 +1,6 @@
 services:
   server:
+    image: public.ecr.aws/h1j3j9q3/sr-mcp-repo:latest
     build:
       context: .
     restart: always
