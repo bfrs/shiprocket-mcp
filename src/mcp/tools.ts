@@ -1,7 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z as zod } from "zod";
 import axios from "axios";
-import { connectionsBySessionId, globalSessionId } from "./connections";
 import { AxiosError } from "axios";
 import { API_DOMAINS } from "@/config";
 
@@ -20,8 +19,10 @@ export const initializeTools = (server: McpServer) => {
       delivery_pincode: zod.string(),
     },
     async ({ delivery_pincode: deliveryPincode }, context) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
 
       const listAddressUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?limit=1&medium=shiprocketMCP`;
 
@@ -110,8 +111,10 @@ export const initializeTools = (server: McpServer) => {
       awb_number: zod.string(),
     },
     async ({ awb_number: awbNumber }, context) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const trackUrl = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/track/awb/${awbNumber}?medium=shiprocketMCP`;
 
       try {
@@ -157,8 +160,8 @@ export const initializeTools = (server: McpServer) => {
           ],
         };
       } catch (err) {
-        if (err instanceof AxiosError) {
-          console.error(err.response?.data);
+        if (err instanceof AxiosError && err.response?.data) {
+          console.error(err.response.data);
 
           return {
             content: [
@@ -166,7 +169,7 @@ export const initializeTools = (server: McpServer) => {
                 type: "text",
                 text: JSON.stringify({
                   success: false,
-                  error: err.response?.data,
+                  error: err.response.data,
                 }),
               },
             ],
@@ -240,8 +243,10 @@ export const initializeTools = (server: McpServer) => {
         }
       }
 
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${
         API_DOMAINS.SHIPROCKET
       }/v1/external/orders?medium=shiprocketMCP${
@@ -340,6 +345,7 @@ export const initializeTools = (server: McpServer) => {
         cod_or_prepaid: Enum('COD', 'PREPAID') representing mode of payment of the order
     
     Returns: List of dictionary containing following info:
+        courier_id: Number representing id of the courier
         courier_name: String representing name of the courier
         cutoff_time: String representing time deadline for 
         etd: Date-time formatted string representing expected date & time of delivery
@@ -361,8 +367,10 @@ export const initializeTools = (server: McpServer) => {
       },
       context
     ) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${
         API_DOMAINS.SERVICEABILITY
       }/courier/ratingserviceability?medium=shiprocketMCP&pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
@@ -381,7 +389,7 @@ export const initializeTools = (server: McpServer) => {
 
         const couriers = data.data.available_courier_companies.map(
           (courier: Record<string, unknown>) => ({
-            courier_name: courier.courier_name,
+            courier_name: courier.courier_company_id,
             cutoff_time: courier.cutoff_time,
             etd: courier.etd,
             freight_charge: courier.freight_charge,
@@ -444,8 +452,10 @@ export const initializeTools = (server: McpServer) => {
     },
     async ({ order_id: orderId, courier_id: courierId }, context) => {
       orderId = orderId.trim();
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/assign/awb`;
 
       try {
@@ -526,8 +536,10 @@ export const initializeTools = (server: McpServer) => {
     },
     async ({ order_id: orderId, pickup_date: pickupDate }, context) => {
       orderId = orderId.trim();
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/pickup`;
 
       try {
@@ -608,8 +620,10 @@ export const initializeTools = (server: McpServer) => {
       { order_id: orderId, cancel_on_channel: cancelOnChannel },
       context
     ) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/cancel`;
 
       try {
@@ -724,8 +738,10 @@ export const initializeTools = (server: McpServer) => {
       ),
     },
     async (args, context) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/create/adhoc`;
 
       try {
@@ -827,8 +843,10 @@ export const initializeTools = (server: McpServer) => {
         pincode: 6-digit number representing pickup address pincode`,
     {},
     async (args, context) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/settings/company/pickup?medium=shiprocketMCP`;
 
       try {
@@ -903,8 +921,10 @@ export const initializeTools = (server: McpServer) => {
         file_url: String representing URL of generated label`,
     { shipment_id: zod.number() },
     async ({ shipment_id: shipmentId }, context) => {
-      const { sellerToken } =
-        connectionsBySessionId[context.sessionId ?? globalSessionId];
+      const sellerToken: string =
+        (context._meta?.seller_token as string | undefined) ??
+        process.env.SELLER_TOKEN ??
+        "";
 
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/generate/label`;
       const data = (

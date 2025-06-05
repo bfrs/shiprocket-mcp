@@ -1,5 +1,4 @@
 import { API_DOMAINS } from "@/config";
-import { connectionsBySessionId, globalSessionId } from "@/mcp/connections";
 import { mcpServer } from "@/mcp/index";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import axios from "axios";
@@ -20,9 +19,7 @@ const transport = new StdioServerTransport();
       await axios.post(url, { email: sellerEmail, password: sellerPassword })
     ).data;
 
-    const sellerToken = data.token as string;
-
-    connectionsBySessionId[globalSessionId] = { transport, sellerToken };
+    process.env.SELLER_TOKEN = data.token as string;
     await mcpServer.connect(transport);
   } catch (err) {
     if (err instanceof axios.AxiosError) {

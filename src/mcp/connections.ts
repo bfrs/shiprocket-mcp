@@ -1,10 +1,8 @@
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import crypto from "node:crypto";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
-export const connectionsBySessionId: Record<
+export const transportBySessionId: Record<
   string,
-  { transport: SSEServerTransport | StdioServerTransport; sellerToken: string }
+  StreamableHTTPServerTransport
 > = {};
 
-export const globalSessionId = crypto.randomUUID();
+export const sellerToken = null;
