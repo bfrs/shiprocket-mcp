@@ -17,7 +17,12 @@ const PORT = process.env.APP_PORT;
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    exposedHeaders: ["Mcp-Session-Id"],
+  })
+);
 
 app.get("/health-check", async (req, res) => {
   res.json({
@@ -27,6 +32,8 @@ app.get("/health-check", async (req, res) => {
 });
 
 app.post("/mcp", async (req, res) => {
+  console.log(req.headers);
+  console.log(req.body);
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     let transport: StreamableHTTPServerTransport;
