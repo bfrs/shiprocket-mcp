@@ -274,7 +274,10 @@ export const shippingRateCalculator = async (
   }
 };
 
-export const fetchShipmentSummary = async (srToken: string) => {
+export const fetchShipmentSummary = async (
+  args: Record<string, unknown>,
+  srToken: string
+) => {
   try {
     const shipmentDetailsPromise = axios.get(
       `${API_DOMAINS.SR_DAHBOARD}/api/2.0/shipment/details`,
@@ -333,5 +336,130 @@ export const fetchShipmentSummary = async (srToken: string) => {
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? "No data found";
+  }
+};
+
+export const fetchOrders = async (
+  args: { status: string },
+  srToken: string
+) => {
+  let concatenatedStatusIds = "";
+
+  switch (args.status) {
+    case "NEW": {
+      concatenatedStatusIds = "1";
+      break;
+    }
+    case "CANCELLED": {
+      concatenatedStatusIds = "5,18";
+      break;
+    }
+    case "READY_TO_SHIP": {
+      concatenatedStatusIds = "34,14,35,12,13,3,4";
+      break;
+    }
+    case "IN_TRANSIT": {
+      concatenatedStatusIds = "37,20,44,19,51,43,6";
+      break;
+    }
+    case "DELIVERED": {
+      concatenatedStatusIds = "7";
+      break;
+    }
+    case "RTO": {
+      concatenatedStatusIds = "15,55,46,45,16,17,36,87,85";
+      break;
+    }
+  }
+
+  const url = `${
+    API_DOMAINS.SHIPROCKET
+  }/v1/external/orders?medium=shiprocketMCP${
+    args.status ? `&filter=${concatenatedStatusIds}&filter_by=status` : ""
+  }`;
+
+  try {
+    const data = (
+      await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    const structuredOrders = data?.data?.map(
+      (order: Record<string, unknown>) => ({
+        order_id: order.id,
+        channel_name: order.channel_name,
+        channel_order_id: order.channel_order_id,
+        customer_name: order.customer_name,
+        order_total_cost: order.total,
+        status: order.status,
+        order_created_at: order.channel_created_at,
+        products: Array.isArray(order.products)
+          ? order.products.map((product: Record<string, unknown>) => ({
+              name: product.name,
+              product_sku: product.channel_sku,
+              quantity: product.quantity,
+            }))
+          : [],
+        shipment_id: Array.isArray(order.shipments)
+          ? order.shipments?.[0]?.id
+          : null,
+        shipping_courier_name: Array.isArray(order.shipments)
+          ? order.shipments?.[0]?.courier
+          : null,
+        awb_number: Array.isArray(order.shipments)
+          ? order.shipments?.[0]?.awb
+          : null,
+        payment_mode: order.cod === 1 ? "COD" : "PREPAID",
+      })
+    );
+
+    return JSON.stringify(structuredOrders);
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to fetch orders due to some error occurred";
+  }
+};
+
+export const shipOrder = async (
+  args: {
+    order_id: string;
+    courier_id: string;
+  },
+  srToken: string
+) => {
+  args.order_id = args.order_id.trim();
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/assign/awb`;
+
+  try {
+    const data = (
+      await axios.post(
+        url,
+        {
+          oid: isNaN(Number(args.order_id))
+            ? args.order_id
+            : parseInt(args.order_id),
+          courier_id: args.courier_id,
+          medium: "shiprocketMCP",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${srToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+    ).data;
+
+    return JSON.stringify({
+      success: true,
+      message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}`,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to assign courier due to some error occurred";
   }
 };

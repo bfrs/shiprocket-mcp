@@ -2,8 +2,10 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
   calculateRTOPerformance,
   calulateCODRemittance,
+  fetchOrders,
   fetchRelevantShiprocketKnowledgebase,
   fetchShipmentSummary,
+  shipOrder,
   shippingRateCalculator,
   trackOrderByAWB,
 } from "@/mcp/api_calls/internal";
@@ -157,5 +159,61 @@ Don't call this tool incase for prepaid
         avg_shipping_cost: Number representing average cost spent on shipments`,
     {},
     toolWrapper(fetchShipmentSummary)
+  );
+
+  server.tool(
+    "order_list",
+    `Get list of orders
+    
+    Args:
+        status: Optional ENUM('NEW', 'READY_TO_SHIP', 'IN_TRANSIT', 'DELIVERED') representing status filter for orders
+        
+    Return: List of dictionary containing following info:
+        order_id: Number representing order id
+        channel_name:  String representing channel name from which order created
+        channel_order_id: String representing channel order id
+        customer_name: String representing name of who customer placed order
+        order_total_cost: Number representing order's total cost (INR)
+        status: String representing current status of order
+        order_created_at: Timestamp formatted string representing order creation timestamp
+        products: List of dictionary containing following info about each product in the order:
+            name: String representing product name
+            product_sku: String representing product SKU
+            quantity: Number representing product quantity
+        shipment_id: Number representing shipment id
+        shipping_courier_name: String representing shipping courier name
+        awb_number: String representing AWB number of order
+        payment_mode: String representing mode of payment for order`,
+    {
+      status: zod
+        .string(
+          zod.enum([
+            "CANCELLED",
+            "NEW",
+            "READY_TO_SHIP",
+            "IN_TRANSIT",
+            "DELIVERED",
+            "RTO",
+          ])
+        )
+        .optional(),
+    },
+    toolWrapper(fetchOrders)
+  );
+
+  server.tool(
+    "order_ship",
+    `Ship order by assigning courier to the order
+
+    Args:
+        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
+        courier_id: Optional number representing courier ID to assign shipment
+        
+    Returns: Dictionary containing success status and a status message`,
+    {
+      order_id: zod.string().min(1),
+      courier_id: zod.number().optional(),
+    },
+    toolWrapper(shipOrder)
   );
 };
