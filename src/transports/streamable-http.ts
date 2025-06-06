@@ -10,6 +10,7 @@ import {
   isInitializeRequest,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
+import { WeaviateService } from "@/services/weaviate";
 
 const PORT = process.env.APP_PORT;
 
@@ -149,4 +150,6 @@ process.on(
   }
 );
 
-app.listen(PORT, () => console.log(`MCP Server listening on port ${PORT}...`));
+WeaviateService.initialize().then(() =>
+  app.listen(PORT, () => console.log(`MCP Server listening on port ${PORT}...`))
+);

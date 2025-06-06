@@ -360,7 +360,7 @@ export const initializeTools = (server: McpServer) => {
     },
     async (
       {
-        pickup_postcode: pickupPincode,
+        pickup_postcode: pickupPostcode,
         delivery_postcode: deliveryPostcode,
         weight_in_kg: weight,
         cod_or_prepaid: codOrPrepaid,
@@ -373,7 +373,7 @@ export const initializeTools = (server: McpServer) => {
         "";
       const url = `${
         API_DOMAINS.SERVICEABILITY
-      }/courier/ratingserviceability?medium=shiprocketMCP&pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
+      }/courier/ratingserviceability?medium=shiprocketMCP&pickup_postcode=${pickupPostcode}&delivery_postcode=${deliveryPostcode}&weight=${weight}&cod=${
         codOrPrepaid === "COD" ? 1 : 0
       }`;
 

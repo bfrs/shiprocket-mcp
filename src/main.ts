@@ -4,10 +4,10 @@ const transportArgVal = transportArg?.split("=")[1];
 
 (async () => {
   if (transportArg && transportArgVal === "sse") {
-    require("@/transports/streamable-http");
     process.env.MCP_TRANSPORT = "STREAMABLE_HTTP";
+    require("@/transports/streamable-http");
   } else {
-    require("@/transports/stdio.js");
     process.env.MCP_TRANSPORT = "STDIO";
+    require("@/transports/stdio.js");
   }
 })();
