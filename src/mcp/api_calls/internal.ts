@@ -161,7 +161,7 @@ export const calculateRTOPerformance = async (
     args.start_date = moment().subtract(30, "days").format("YYYY-MMM-DD");
   }
 
-  const url = `${API_DOMAINS.SR_DAHBOARD}/api/2.0/rto/chart-wise-data?courier=&courier_mode=&end_date=${args.end_date}&is_web=0&payment_method=&start_date=${args.start_date}&zones=`;
+  const url = `${API_DOMAINS.SR_DASHBOARD}/api/2.0/rto/chart-wise-data?courier=&courier_mode=&end_date=${args.end_date}&is_web=0&payment_method=&start_date=${args.start_date}&zones=`;
 
   try {
     const data = (
@@ -258,7 +258,7 @@ export const shippingRateCalculator = async (
     const couriers = data.data.available_courier_companies.map(
       (courier: Record<string, unknown>) => ({
         courier_id: courier.courier_company_id,
-        courier_name: courier.courier_company,
+        courier_name: courier.courier_name,
         cutoff_time: courier.cutoff_time,
         etd: courier.etd,
         freight_charge: courier.freight_charge,
@@ -267,7 +267,10 @@ export const shippingRateCalculator = async (
       })
     );
 
-    return JSON.stringify(couriers);
+    return JSON.stringify({
+      inputs: args,
+      data: couriers,
+    });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? "Unable to fetch couriers due to some error";
@@ -280,7 +283,7 @@ export const fetchShipmentSummary = async (
 ) => {
   try {
     const shipmentDetailsPromise = axios.get(
-      `${API_DOMAINS.SR_DAHBOARD}/api/2.0/shipment/details`,
+      `${API_DOMAINS.SR_REPORT}/pinot-data`,
       {
         headers: {
           Authorization: `Bearer ${srToken}`,
@@ -290,7 +293,7 @@ export const fetchShipmentSummary = async (
     );
 
     const avgShippingCostPromise = axios.get(
-      `${API_DOMAINS.SR_DAHBOARD}/api/getavgshippingcost`,
+      `${API_DOMAINS.SR_DASHBOARD}/api/getavgshippingcost`,
       {
         headers: {
           Authorization: `Bearer ${srToken}`,
@@ -308,7 +311,9 @@ export const fetchShipmentSummary = async (
       if (response.status === "fulfilled" && "data" in response.value.data) {
         return response.value.data.data;
       } else {
-        return null;
+        if (response.status === "rejected") {
+          throw response.reason;
+        }
       }
     });
 
@@ -316,17 +321,16 @@ export const fetchShipmentSummary = async (
       timeline: "Last 30 days",
       data: {
         total_shipments:
-          data?.[0]?.shipping_data?.total_orders ?? "No data found",
+          data?.[0]?.shipment_details?.[0]?.total_shipments ?? "No data found",
         pickup_pending:
-          data?.[0]?.shipping_data?.pqueueschedule ?? "No data found",
+          data?.[0]?.shipment_details?.[0]?.pickup_pending ?? "No data found",
         in_transit:
-          typeof data?.[0]?.shipping_data?.intrans === "number" &&
-          typeof data?.[0]?.shipping_data?.ofd === "number"
-            ? data?.[0]?.shipping_data?.intrans + data?.[0]?.shipping_data?.ofd
-            : "No data found",
-        delivered: data?.[0]?.shipping_data?.delivered ?? "No data found",
-        ndr_pending: data?.[0]?.shipping_data?.undelivered ?? "No data found",
-        rto_shipments: data?.[0]?.shipping_data?.rto ?? "No data found",
+          data?.[0]?.shipment_details?.[0]?.in_transit ?? "No data found",
+        delivered:
+          data?.[0]?.shipment_details?.[0]?.delivered ?? "No data found",
+        ndr_pending:
+          data?.[0]?.shipment_details?.[0]?.undelivered ?? "No data found",
+        rto_shipments: data?.[0]?.shipment_details?.[0]?.rto ?? "No data found",
         avg_shipping_cost:
           typeof data?.[1]?.[0]?.count === "number"
             ? `₹${data?.[1]?.[0]?.count}`
@@ -432,7 +436,7 @@ export const shipOrder = async (
   srToken: string
 ) => {
   args.order_id = args.order_id.trim();
-  const url = `${API_DOMAINS.SHIPROCKET}/v1/external/courier/assign/awb`;
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/assign/awb`;
 
   try {
     const data = (
@@ -461,5 +465,128 @@ export const shipOrder = async (
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? "Unable to assign courier due to some error occurred";
+  }
+};
+
+export const orderSchedulePickup = async (
+  args: { order_id: string; pickup_date: string },
+  srToken: string
+) => {
+  args.order_id = args.order_id.trim();
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/pickup`;
+
+  try {
+    const data = (
+      await axios.post(
+        url,
+        {
+          oid: isNaN(Number(args.order_id))
+            ? args.order_id
+            : parseInt(args.order_id),
+          pickup_date: [args.pickup_date],
+          medium: "shiprocketMCP",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${srToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+    ).data;
+
+    console.log(data);
+
+    if (data?.Status === false) {
+      return JSON.stringify({
+        success: false,
+        message: data?.Message,
+      });
+    }
+
+    return JSON.stringify({
+      success: true,
+      message: `Shipment's pickup is scheduled on date ${data?.response?.pickup_scheduled_date}`,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to schedule your pickup due to some error occurred";
+  }
+};
+
+export const orderCreate = async (
+  args: {
+    pickup_location: string;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: number;
+    delivery_address: string;
+    delivery_city: string;
+    delivery_pincode: number;
+    delivery_state: string;
+    delivery_country: string;
+    length: number;
+    breadth: number;
+    height: number;
+    weight: number;
+    mode_of_payment: string;
+    order_items: {
+      name: string;
+      sku: string;
+      units: number;
+      selling_price: number;
+    }[];
+  },
+  srToken: string
+) => {
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/create/adhoc`;
+
+  try {
+    const data = (
+      await axios.post(
+        url,
+        {
+          order_id: `MCP-${Date.now()}-${Math.floor(Math.random() * 10000)
+            .toString()
+            .padStart(4)}`,
+          order_date: new Date().toLocaleDateString("en-CA"),
+          pickup_location: args.pickup_location,
+          billing_customer_name: args.customer_name,
+          billing_address: args.delivery_address,
+          billing_city: args.delivery_city,
+          billing_pincode: args.delivery_pincode,
+          billing_state: args.delivery_state,
+          billing_country: args.delivery_country,
+          billing_email: args.customer_email,
+          billing_phone: args.customer_phone,
+          shipping_is_billing: true,
+          order_items: args.order_items,
+          payment_method: args.mode_of_payment,
+          sub_total: args.order_items.reduce(
+            (acc, item) => acc + item.selling_price * item.units,
+            0
+          ),
+          length: args.length,
+          breadth: args.breadth,
+          height: args.height,
+          weight: args.weight,
+          medium: "shiprocketMCP",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${srToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+    ).data;
+
+    return JSON.stringify({
+      success: true,
+      message: `Order created successfully with Order Id: ${data.order_id}`,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to create your order due to some error occurred";
   }
 };

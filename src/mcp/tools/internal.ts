@@ -5,6 +5,8 @@ import {
   fetchOrders,
   fetchRelevantShiprocketKnowledgebase,
   fetchShipmentSummary,
+  orderCreate,
+  orderSchedulePickup,
   shipOrder,
   shippingRateCalculator,
   trackOrderByAWB,
@@ -215,5 +217,74 @@ Don't call this tool incase for prepaid
       courier_id: zod.number().optional(),
     },
     toolWrapper(shipOrder)
+  );
+
+  server.tool(
+    "order_schedule_pickup",
+    `Schedule pickup for the order shipment
+
+    Args:
+        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
+        pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
+
+    Returns: Dictionary containing success status and a status message`,
+    {
+      order_id: zod.string().min(1),
+      pickup_date: zod.string(),
+    },
+    toolWrapper(orderSchedulePickup)
+  );
+
+  server.tool(
+    `order_create`,
+    `Create order
+
+    Args:
+        pickup_location: String representing short nickname of pickup location
+        customer_name: String representing name of the customer who placed order
+        customer_email: String representing email of the customer who placed order
+        customer_phone: 10-digit number representing phone number of the customer who placed order
+        delivery_address: String representing customer address on which order will be delivered
+        delivery_city: String representing city of delivery address
+        delivery_pincode: 6-digit number representing pincode of delivery address
+        delivery_state: String representing state of delivery address
+        delivery_country: String representing country of delivery address
+        length:	Number representing length of the order package in centimeters
+        breadth: Number representing breadth of the order package in centimeters
+        height:	Number representing height of the order package in centimeters
+        weight: Number representing wight of the order package in kilograms
+        mode_of_payment: Enum('COD', 'PREPAID') representing mode of payment for the order
+        order_items: List of dictionary containing following info of each product in the order:
+            name: String representing name of the product item
+            sku: String representing SKU of the product item
+            units: Number representing quantity of product ordered
+            selling_price: Number representing price of product ordered
+
+    Returns: Dictionary containing success status and a status message`,
+    {
+      pickup_location: zod.string(),
+      customer_name: zod.string(),
+      customer_email: zod.string().email(),
+      customer_phone: zod.number(),
+      delivery_address: zod.string(),
+      delivery_city: zod.string(),
+      delivery_pincode: zod.number(),
+      delivery_state: zod.string(),
+      delivery_country: zod.string().default("India"),
+      length: zod.number(),
+      breadth: zod.number(),
+      height: zod.number(),
+      weight: zod.number(),
+      mode_of_payment: zod.string(zod.enum(["COD", "PREPAID"])),
+      order_items: zod.array(
+        zod.object({
+          name: zod.string(),
+          sku: zod.string(),
+          units: zod.number(),
+          selling_price: zod.number(),
+        })
+      ),
+    },
+    toolWrapper(orderCreate)
   );
 };

@@ -32,21 +32,23 @@ app.get("/health-check", async (req, res) => {
 });
 
 app.post("/mcp", async (req, res) => {
-  console.log(req.headers);
-  console.log(req.body);
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     let transport: StreamableHTTPServerTransport;
 
-    if (sessionId && transportBySessionId[sessionId]) {
-      transport = transportBySessionId[sessionId];
+    if (sessionId && transportBySessionId.has(sessionId)) {
+      transport = transportBySessionId.get(sessionId)!.transport;
+      transportBySessionId.get(sessionId)!.lastUsedAt = Date.now();
     } else if (!sessionId && isInitializeRequest(req.body)) {
       transport = new StreamableHTTPServerTransport({
         enableJsonResponse: true,
         sessionIdGenerator: () => randomUUID(),
         onsessioninitialized: (sessionId) => {
           console.log("Session initialized with ID: " + sessionId);
-          transportBySessionId[sessionId] = transport;
+          transportBySessionId.set(sessionId, {
+            transport,
+            lastUsedAt: Date.now(),
+          });
         },
       });
 
@@ -90,19 +92,19 @@ app.get("/mcp", async (req, res) => {
 app.delete("/mcp", async (req, res) => {
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
-    if (!sessionId || !transportBySessionId[sessionId]) {
+    if (!sessionId || !transportBySessionId.has(sessionId)) {
       res
         .status(400)
         .json({ success: false, error: "Session ID missing or invalid" });
       return;
     }
 
-    const transport = transportBySessionId[sessionId];
+    const transport = transportBySessionId.get(sessionId)!.transport;
     await transport.handleRequest(req, res);
 
     console.log("Session closed for ID: " + transport.sessionId);
-    if (transport.sessionId) {
-      delete transportBySessionId[transport.sessionId];
+    if (transport.sessionId === sessionId) {
+      transportBySessionId.delete(transport.sessionId);
     }
   } catch (err) {
     if (err instanceof Error) {
