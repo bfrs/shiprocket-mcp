@@ -32,6 +32,7 @@ app.get("/health-check", async (req, res) => {
 });
 
 app.post("/mcp", async (req, res) => {
+  console.log(req.body);
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     let transport: StreamableHTTPServerTransport;

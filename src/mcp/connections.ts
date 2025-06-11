@@ -11,6 +11,7 @@ setInterval(() => {
   for (const [sessionId, session] of transportBySessionId) {
     if (Date.now() - session.lastUsedAt > SESSION_EXPIRATION_DURATION) {
       transportBySessionId.delete(sessionId);
+      console.log("Session destroyed with ID: " + sessionId);
     }
   }
 }, SESSION_EXPIRATION_DURATION);
