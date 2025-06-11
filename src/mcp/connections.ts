@@ -5,14 +5,14 @@ export const transportBySessionId = new Map<
   { transport: StreamableHTTPServerTransport; lastUsedAt: number }
 >();
 
-const SESSION_EXPIRATION_DURATION = 60 * 1000;
+// const SESSION_EXPIRATION_DURATION = 60 * 1000;
 
-setInterval(() => {
-  for (const [sessionId, session] of transportBySessionId) {
-    if (Date.now() - session.lastUsedAt > SESSION_EXPIRATION_DURATION) {
-      transportBySessionId.delete(sessionId);
-    }
-  }
-}, SESSION_EXPIRATION_DURATION);
+// setInterval(() => {
+//   for (const [sessionId, session] of transportBySessionId) {
+//     if (Date.now() - session.lastUsedAt > SESSION_EXPIRATION_DURATION) {
+//       transportBySessionId.delete(sessionId);
+//     }
+//   }
+// }, SESSION_EXPIRATION_DURATION);
 
 export const sellerToken = null;

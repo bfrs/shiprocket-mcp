@@ -8,7 +8,7 @@ export const handleAxiosAPIErrorLogging = (
       return "TOKEN_EXPIRED";
     } else if (error.response?.data) {
       const responseData = JSON.stringify(error.response.data);
-      console.log(
+      console.error(
         `SR API ERROR:\n REQUEST: ${JSON.stringify(
           error.request?._header
         )}\n RESPONSE: ${responseData}}`

@@ -103,6 +103,7 @@ export const trackOrderByAWB = async (
       order_id: string;
       created_on: string;
       order_status: string;
+      shipment_id: number;
       awb_data: {
         number: string;
         last_activity: string;
@@ -114,6 +115,7 @@ export const trackOrderByAWB = async (
       order_id: orderData.data.data.id as string,
       created_on: orderData.data.data.created_at as string,
       order_status: orderData.data.data.status as string,
+      shipment_id: orderData.data.data.shipments.id as number,
       awb_data: null,
     };
 
@@ -376,9 +378,7 @@ export const fetchOrders = async (
     }
   }
 
-  const url = `${
-    API_DOMAINS.SHIPROCKET
-  }/v1/external/orders?medium=shiprocketMCP${
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/orders?medium=shiprocketMCP${
     args.status ? `&filter=${concatenatedStatusIds}&filter_by=status` : ""
   }`;
 
@@ -495,8 +495,6 @@ export const orderSchedulePickup = async (
       )
     ).data;
 
-    console.log(data);
-
     if (data?.Status === false) {
       return JSON.stringify({
         success: false,
@@ -588,5 +586,103 @@ export const orderCreate = async (
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? "Unable to create your order due to some error occurred";
+  }
+};
+
+export const orderCancel = async (
+  args: {
+    order_id: number;
+    cancel_on_channel: boolean;
+  },
+  srToken: string
+) => {
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/orders/cancel`;
+
+  try {
+    await axios.post(
+      url,
+      {
+        ids: [args.order_id],
+        cancel_on_channel: args.cancel_on_channel,
+        medium: "shiprocketMCP",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return JSON.stringify({
+      success: true,
+      message: `Order cancelled successfully`,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to cancel your order due to some error occurred";
+  }
+};
+
+export const listPickupAddresses = async (args: unknown, srToken: string) => {
+  const url = `${API_DOMAINS.SHIPROCKET}/v1/settings/company/pickup-address?medium=shiprocketMCP`;
+
+  try {
+    const data = (
+      await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    return JSON.stringify(
+      data?.data?.shipping_address
+        ?.slice(0, 10)
+        ?.map((address: Record<string, unknown>) => ({
+          pickup_address_id: address.id,
+          pickup_location_nickname: address.pickup_location,
+          address: address.address,
+          city: address.city,
+          state: address.state,
+          country: address.country,
+          pincode: address.pin_code,
+        }))
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? `Unable to fetch pickup addresses due to some error occurred`;
+  }
+};
+
+export const generateLabel = async (
+  args: { shipment_id: number },
+  srToken: string
+) => {
+  try {
+    const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/label`;
+    const data = (
+      await axios.post(
+        url,
+        {
+          shipment_id: [args.shipment_id],
+          medium: "shiprocketMCP",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${srToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+    ).data;
+
+    return JSON.stringify({
+      file_url: data.label_url,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? `Unable to generate label due to some error occurred`;
   }
 };

@@ -1,16 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  calculateRTOPerformance,
-  calulateCODRemittance,
-  fetchOrders,
-  fetchRelevantShiprocketKnowledgebase,
-  fetchShipmentSummary,
-  orderCreate,
-  orderSchedulePickup,
-  shipOrder,
-  shippingRateCalculator,
-  trackOrderByAWB,
-} from "@/mcp/api_calls/internal";
+import * as ApiCalls from "@/mcp/api_calls/internal";
 import { toolWrapper } from "@/mcp/tools/utils";
 import { z as zod } from "zod";
 import moment from "moment";
@@ -28,7 +17,7 @@ export const initializeTools = (server: McpServer) => {
       query: zod.string(),
     },
     (args, context) =>
-      toolWrapper(fetchRelevantShiprocketKnowledgebase)(
+      toolWrapper(ApiCalls.fetchRelevantShiprocketKnowledgebase)(
         { query: args.query, source: context._meta?.source },
         context
       )
@@ -45,6 +34,7 @@ export const initializeTools = (server: McpServer) => {
         order_id: String representing order id
         created_on: Timestamp formatted string representing order creation date-time
         order_status: String representing status of order
+        shipment_id: Number representing shipment ID
         awb_data: Optional dictionary containing following AWB information of order:
           number: String representing AWB number
           last_activity: String representing last marked activity of order
@@ -54,7 +44,7 @@ export const initializeTools = (server: McpServer) => {
     {
       track_id: zod.string(),
     },
-    toolWrapper(trackOrderByAWB)
+    toolWrapper(ApiCalls.trackOrderByAWB)
   );
 
   server.tool(
@@ -78,7 +68,7 @@ Show data in tabular format.
       start_date: zod.string(),
       end_date: zod.string(),
     },
-    toolWrapper(calculateRTOPerformance)
+    toolWrapper(ApiCalls.calculateRTOPerformance)
   );
 
   server.tool(
@@ -106,7 +96,7 @@ Don't call this tool incase for prepaid
       start_date: zod.string(),
       end_date: zod.string(),
     },
-    toolWrapper(calulateCODRemittance)
+    toolWrapper(ApiCalls.calulateCODRemittance)
   );
 
   server.tool(
@@ -144,7 +134,7 @@ Don't call this tool incase for prepaid
       weight_in_kg: zod.number(),
       payment_type: zod.enum(["COD", "PREPAID"]),
     },
-    toolWrapper(shippingRateCalculator)
+    toolWrapper(ApiCalls.shippingRateCalculator)
   );
 
   server.tool(
@@ -160,7 +150,7 @@ Don't call this tool incase for prepaid
         rto_shipments: Number representing total shipments which got RTO
         avg_shipping_cost: Number representing average cost spent on shipments`,
     {},
-    toolWrapper(fetchShipmentSummary)
+    toolWrapper(ApiCalls.fetchShipmentSummary)
   );
 
   server.tool(
@@ -200,7 +190,7 @@ Don't call this tool incase for prepaid
         )
         .optional(),
     },
-    toolWrapper(fetchOrders)
+    toolWrapper(ApiCalls.fetchOrders)
   );
 
   server.tool(
@@ -216,7 +206,7 @@ Don't call this tool incase for prepaid
       order_id: zod.string().min(1),
       courier_id: zod.number().optional(),
     },
-    toolWrapper(shipOrder)
+    toolWrapper(ApiCalls.shipOrder)
   );
 
   server.tool(
@@ -232,7 +222,7 @@ Don't call this tool incase for prepaid
       order_id: zod.string().min(1),
       pickup_date: zod.string(),
     },
-    toolWrapper(orderSchedulePickup)
+    toolWrapper(ApiCalls.orderSchedulePickup)
   );
 
   server.tool(
@@ -285,6 +275,48 @@ Don't call this tool incase for prepaid
         })
       ),
     },
-    toolWrapper(orderCreate)
+    toolWrapper(ApiCalls.orderCreate)
+  );
+
+  server.tool(
+    "order_cancel",
+    `Cancel order
+
+    Args:
+        order_id: Number representing order ID
+        cancel_on_channel: Optional boolean representing if the order should also be cancelled on the original channel
+        
+    Returns: Dictionary containing success status and a status message`,
+    {
+      order_id: zod.number(),
+      cancel_on_channel: zod.boolean().default(true),
+    },
+    toolWrapper(ApiCalls.orderCancel)
+  );
+
+  server.tool(
+    "list_pickup_addresses",
+    `Get all the pickup address of the seller
+
+    Returns: List of dictionary representing pickup addresses of seller with following info:
+        pickup_address_id: Number representing pickup address ID
+        pickup_location_nickname: String representing short nickname of pickup location
+        address: String representing pickup address line
+        city: String representing pickup address city
+        state: String representing pickup address state
+        country: String representing pickup address country
+        pincode: 6-digit number representing pickup address pincode`,
+    {},
+    toolWrapper(ApiCalls.listPickupAddresses)
+  );
+
+  server.tool(
+    "generate_shipment_label",
+    `Generate shipment label and get the link of generated label as PDF file
+
+    Returns:
+        file_url: String representing URL of generated label`,
+    { shipment_id: zod.number() },
+    toolWrapper(ApiCalls.generateLabel)
   );
 };
