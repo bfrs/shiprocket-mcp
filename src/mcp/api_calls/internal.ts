@@ -657,16 +657,29 @@ export const listPickupAddresses = async (args: unknown, srToken: string) => {
 };
 
 export const generateLabel = async (
-  args: { shipment_id: number },
+  args: { order_id: string },
   srToken: string
 ) => {
   try {
-    const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/label`;
+    const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/copilot/order/show/${args.order_id}`;
+    const orderDetails = (
+      await axios.get(orderDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    const generateLableUrl = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/label`;
+
+    const shipmentId = orderDetails.data.shipments.id as number;
+
     const data = (
       await axios.post(
-        url,
+        generateLableUrl,
         {
-          shipment_id: [args.shipment_id],
+          shipment_id: [shipmentId],
           medium: "shiprocketMCP",
         },
         {

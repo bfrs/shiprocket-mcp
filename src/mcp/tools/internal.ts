@@ -28,7 +28,7 @@ export const initializeTools = (server: McpServer) => {
     `Calculate data for the order tracking status using (order id)/(AWB id)/(Channel order id) as tracking ID. For query related to order tracking/status, you must use this tool! Ask for (order id)/(AWB id)/(Channel order id) if order id is not provided
     
     Args:
-        track_id: String representing alphanumeric tracking ID which can be (order id)/(AWB id)/(Channel order id).
+        track_id: String representing alphanumeric tracking ID which can be (shiprocket order id)/(AWB id)/(Channel order id).
     
     Returns: Dictionary containing following info:
         order_id: String representing order id
@@ -314,9 +314,12 @@ Don't call this tool incase for prepaid
     "generate_shipment_label",
     `Generate shipment label and get the link of generated label as PDF file
 
+    Args:
+        order_id: String representing alphanumeric tracking ID which can be (shiprocket order id)/(AWB id)/(Channel order id).
+
     Returns:
         file_url: String representing URL of generated label`,
-    { shipment_id: zod.number() },
+    { order_id: zod.string() },
     toolWrapper(ApiCalls.generateLabel)
   );
 };
