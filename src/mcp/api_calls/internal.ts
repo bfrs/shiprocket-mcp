@@ -589,6 +589,59 @@ export const orderCreate = async (
   }
 };
 
+export const orderEdit = async (
+  args: {
+    order_id: string;
+    length: number;
+    breadth: number;
+    height: number;
+    weight: number;
+  },
+  srToken: string
+) => {
+  try {
+    const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/copilot/order/show/${args.order_id}`;
+    const orderEditUrl = `${API_DOMAINS.SHIPROCKET}/v1/orders/edit`;
+
+    const orderDetails = (
+      await axios.get(orderDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    const srOrderId = orderDetails.data.id as number;
+
+    await axios.post(
+      orderEditUrl,
+      {
+        order_id: srOrderId,
+        length: args.length,
+        breadth: args.breadth,
+        height: args.height,
+        weight: args.weight,
+        action: ["product_details"],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return JSON.stringify({
+      success: true,
+      message: `Order updated successfully`,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
+    return msg ?? "Unable to edit your order due to some error occurred";
+  }
+};
+
 export const orderCancel = async (
   args: {
     order_id: number;
