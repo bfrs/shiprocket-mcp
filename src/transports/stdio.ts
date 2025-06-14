@@ -1,5 +1,5 @@
 import { API_DOMAINS } from "@/config";
-import { mcpServer } from "@/mcp/index";
+import { getMcpServer } from "@/mcp/index";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import axios from "axios";
 
@@ -20,6 +20,7 @@ const transport = new StdioServerTransport();
     ).data;
 
     process.env.SELLER_TOKEN = data.token as string;
+    const mcpServer = getMcpServer();
     await mcpServer.connect(transport);
   } catch (err) {
     if (err instanceof axios.AxiosError) {
