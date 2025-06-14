@@ -285,7 +285,7 @@ export const fetchShipmentSummary = async (
 ) => {
   try {
     const shipmentDetailsPromise = axios.get(
-      `${API_DOMAINS.SR_REPORT}/pinot-data`,
+      `${API_DOMAINS.SR_REPORT}/dashboard/details`,
       {
         headers: {
           Authorization: `Bearer ${srToken}`,

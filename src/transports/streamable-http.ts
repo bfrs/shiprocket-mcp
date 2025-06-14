@@ -1,4 +1,4 @@
-import { mcpServer } from "@/mcp/index";
+import { getMcpServer } from "@/mcp/index";
 import express, { NextFunction, Request, Response } from "express";
 import { transportBySessionId } from "@/mcp/connections";
 import "dotenv/config";
@@ -32,19 +32,14 @@ app.get("/health-check", async (req, res) => {
 });
 
 app.post("/mcp", async (req, res) => {
-  console.log(req.body);
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
-    console.log(sessionId);
     let transport: StreamableHTTPServerTransport;
 
     if (sessionId && transportBySessionId.has(sessionId)) {
-      console.log("session already present");
       transport = transportBySessionId.get(sessionId)!.transport;
-      console.log(transport);
       transportBySessionId.get(sessionId)!.lastUsedAt = Date.now();
     } else if (!sessionId && isInitializeRequest(req.body)) {
-      console.log("session initializing");
       transport = new StreamableHTTPServerTransport({
         enableJsonResponse: true,
         sessionIdGenerator: () => randomUUID(),
@@ -57,6 +52,7 @@ app.post("/mcp", async (req, res) => {
         },
       });
 
+      const mcpServer = getMcpServer();
       await mcpServer.connect(transport);
     } else {
       throw new McpError(
@@ -65,11 +61,8 @@ app.post("/mcp", async (req, res) => {
       );
     }
 
-    console.log("Start of handle request: " + transport.sessionId);
     await transport.handleRequest(req, res, req.body);
-    console.log("End of handle request: " + transport.sessionId);
   } catch (err) {
-    console.log("Error: " + err);
     if (err instanceof McpError) {
       res.status(400).json({
         jsonrpc: "2.0",
