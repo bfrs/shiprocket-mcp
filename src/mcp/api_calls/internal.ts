@@ -1,7 +1,7 @@
 import axios from "axios";
 import { handleAxiosAPIErrorLogging } from "./utils";
 import moment from "moment";
-import { API_DOMAINS } from "@/config";
+import { API_DOMAINS, SR_APP_DOMAIN } from "@/config";
 import { WeaviateService } from "@/services/weaviate";
 import { WeaviateReturn } from "weaviate-client";
 
@@ -175,7 +175,10 @@ export const calculateRTOPerformance = async (
       })
     ).data;
 
-    return JSON.stringify(data.data.info as Record<string, unknown>);
+    return JSON.stringify({
+      data: data.data.info,
+      url: `${SR_APP_DOMAIN}/seller/domestic-dashboard/rto`,
+    } as Record<string, unknown>);
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return (
@@ -220,6 +223,7 @@ export const calulateCODRemittance = async (
       total_cod_remitted: codRemittanceData.total_COD_remitted,
       total_adjustment_amount: codRemittanceData.total_adjustment_amount,
       remittance_initiated: codRemittanceData.in_process,
+      url: `${SR_APP_DOMAIN}/remittance-logs`,
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
@@ -431,24 +435,55 @@ export const fetchOrders = async (
 export const shipOrder = async (
   args: {
     order_id: string;
-    courier_id: string;
+    courier_id?: number;
   },
   srToken: string
 ) => {
   args.order_id = args.order_id.trim();
-  const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/assign/awb`;
+
+  const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/copilot/order/show/${args.order_id}`;
+  const shipOrderUrl = `${API_DOMAINS.SHIPROCKET}/v1/courier/assign/awb`;
 
   try {
-    const data = (
-      await axios.post(
-        url,
-        {
-          oid: isNaN(Number(args.order_id))
-            ? args.order_id
-            : parseInt(args.order_id),
-          courier_id: args.courier_id,
-          medium: "shiprocketMCP",
+    const orderDetails = (
+      await axios.get(orderDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
         },
+      })
+    ).data;
+
+    const srOrderId = orderDetails.data.id as number;
+
+    if (args.courier_id) {
+      const data = (
+        await axios.post(
+          shipOrderUrl,
+          {
+            oid: srOrderId,
+            courier_id: args.courier_id,
+            medium: "shiprocketMCP",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${srToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+      ).data;
+
+      return JSON.stringify({
+        success: true,
+        message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}.
+  Check order details using order detail page: ${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}}`,
+      });
+    }
+
+    const couriersData = (
+      await axios.get(
+        `${API_DOMAINS.SERVICEABILITY}/courier/serviceability?order_id=${srOrderId}`,
         {
           headers: {
             Authorization: `Bearer ${srToken}`,
@@ -459,8 +494,17 @@ export const shipOrder = async (
     ).data;
 
     return JSON.stringify({
-      success: true,
-      message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}`,
+      message: "Please select any courier from the couriers list provided",
+      couriers:
+        couriersData?.data?.available_courier_companies
+          ?.slice(0, 10)
+          ?.map((courier: Record<string, unknown>) => ({
+            courier_id: courier.courier_company_id,
+            courier_name_with_id: `${courier.courier_name} (ID: ${courier.courier_company_id})`,
+            shipping_cost: courier.rate,
+            courier_rating: courier.rating,
+            etd: courier.etd,
+          })) ?? [],
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
@@ -473,16 +517,26 @@ export const orderSchedulePickup = async (
   srToken: string
 ) => {
   args.order_id = args.order_id.trim();
-  const url = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/pickup`;
+  const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/copilot/order/show/${args.order_id}`;
+  const pickupGenerateUrl = `${API_DOMAINS.SHIPROCKET}/v1/courier/generate/pickup`;
 
   try {
-    const data = (
+    const orderDetails = (
+      await axios.get(orderDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    const srOrderId = orderDetails.data.id as number;
+
+    const pickupData = (
       await axios.post(
-        url,
+        pickupGenerateUrl,
         {
-          oid: isNaN(Number(args.order_id))
-            ? args.order_id
-            : parseInt(args.order_id),
+          oid: srOrderId,
           pickup_date: [args.pickup_date],
           medium: "shiprocketMCP",
         },
@@ -495,16 +549,16 @@ export const orderSchedulePickup = async (
       )
     ).data;
 
-    if (data?.Status === false) {
+    if (pickupData?.Status === false) {
       return JSON.stringify({
         success: false,
-        message: data?.Message,
+        message: pickupData?.Message,
       });
     }
 
     return JSON.stringify({
       success: true,
-      message: `Shipment's pickup is scheduled on date ${data?.response?.pickup_scheduled_date}`,
+      message: `Shipment's pickup is scheduled on date ${pickupData?.response?.pickup_scheduled_date}. Check details on ${SR_APP_DOMAIN}/seller/orders/details/${orderDetails.data.id}`,
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
@@ -649,13 +703,25 @@ export const orderCancel = async (
   },
   srToken: string
 ) => {
-  const url = `${API_DOMAINS.SHIPROCKET}/v1/orders/cancel`;
+  const orderDetailUrl = `${API_DOMAINS.SHIPROCKET}/v1/copilot/order/show/${args.order_id}`;
+  const orderCancelUrl = `${API_DOMAINS.SHIPROCKET}/v1/orders/cancel`;
 
   try {
+    const orderDetails = (
+      await axios.get(orderDetailUrl, {
+        headers: {
+          Authorization: `Bearer ${srToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+    ).data;
+
+    const srOrderId = orderDetails.data.id as number;
+
     await axios.post(
-      url,
+      orderCancelUrl,
       {
-        ids: [args.order_id],
+        ids: [srOrderId],
         cancel_on_channel: args.cancel_on_channel,
         medium: "shiprocketMCP",
       },
@@ -669,7 +735,7 @@ export const orderCancel = async (
 
     return JSON.stringify({
       success: true,
-      message: `Order cancelled successfully`,
+      message: `Order cancelled successfully. Check details on ${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}`,
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
@@ -690,8 +756,9 @@ export const listPickupAddresses = async (args: unknown, srToken: string) => {
       })
     ).data;
 
-    return JSON.stringify(
-      data?.data?.shipping_address
+    return JSON.stringify({
+      url: `${SR_APP_DOMAIN}/seller/settings/company-setup/pickup-addresses`,
+      pickup_addresses: data?.data?.shipping_address
         ?.slice(0, 10)
         ?.map((address: Record<string, unknown>) => ({
           pickup_address_id: address.id,
@@ -701,8 +768,8 @@ export const listPickupAddresses = async (args: unknown, srToken: string) => {
           state: address.state,
           country: address.country,
           pincode: address.pin_code,
-        }))
-    );
+        })),
+    });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? `Unable to fetch pickup addresses due to some error occurred`;

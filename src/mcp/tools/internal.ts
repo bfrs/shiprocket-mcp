@@ -51,8 +51,7 @@ export const initializeTools = (server: McpServer) => {
     "rto_performance_tool",
     `Calculate data for the RTO (Retrun To Origin) performance for provided start date and end date.
 Call rto_performance_tool tool ONLY and ONLY when user asking for "RTO Performance" and nothing else.
-Delivery performance is not RTO perfromance
-Show data in tabular format.
+Delivery performance is not RTO perfromance.
 
     Args:
         start_date: String representing starting date for filtering RTO data in the format of YYYY-Mon-dd. In case user provided such as last 30 days, take start date as (current_date - 30 days). current_date = ${moment().format(
@@ -63,7 +62,9 @@ Show data in tabular format.
         )}
 
     
-    Returns: Dictionary containing duration wise RTO performance`,
+    Returns: Dictionary containing following info
+        data: Dictionary containing duration wise RTO performance
+        url: URL of RTO Performance page`,
     {
       start_date: zod.string(),
       end_date: zod.string(),
@@ -91,7 +92,8 @@ Don't call this tool incase for prepaid
         last_cod_remitted: Amount (INR) representing COD last remitted
         total_cod_remitted: Amount (INR) representing total COD remitted
         total_adjustment_amount: Amount (INR) representing total deduction from COD
-        remittance_initiated: Amount (INR) for which remittance is initiated`,
+        remittance_initiated: Amount (INR) for which remittance is initiated
+        url: URL of remittance page`,
     {
       start_date: zod.string(),
       end_date: zod.string(),
@@ -195,10 +197,10 @@ Don't call this tool incase for prepaid
 
   server.tool(
     "order_ship",
-    `Ship order by assigning courier to the order
+    `Ship order by assigning courier to the order. If courier ID is not provided, this tool will respond with available courier list to ship the order.
 
     Args:
-        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
+        order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
         courier_id: Optional number representing courier ID to assign shipment
         
     Returns: Dictionary containing success status and a status message`,
@@ -214,7 +216,7 @@ Don't call this tool incase for prepaid
     `Schedule pickup for the order shipment
 
     Args:
-        order_id: Alphanumeric ID which can be 'Order ID' or 'Channel Order ID' or 'Shipment ID'
+        order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
         pickup_date: Date formatted ('YYYY-MM-DD') string representing date on which pickup will be scheduled
 
     Returns: Dictionary containing success status and a status message`,
@@ -230,7 +232,7 @@ Don't call this tool incase for prepaid
     `Edit order product's dimensions (lenght, breadth, height) and weight
 
     Args:
-        order_id: Alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
+        order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
         length: Number representing length of product in centimeters
         breadth: Number representing breadth of product in centimeters
         height: Number representing height of product in centimeters
@@ -305,12 +307,12 @@ Don't call this tool incase for prepaid
     `Cancel order
 
     Args:
-        order_id: Number representing order ID
+        order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
         cancel_on_channel: Optional boolean representing if the order should also be cancelled on the original channel
         
     Returns: Dictionary containing success status and a status message`,
     {
-      order_id: zod.number(),
+      order_id: zod.string(),
       cancel_on_channel: zod.boolean().default(true),
     },
     toolWrapper(ApiCalls.orderCancel)
@@ -320,14 +322,16 @@ Don't call this tool incase for prepaid
     "list_pickup_addresses",
     `Get all the pickup address of the seller
 
-    Returns: List of dictionary representing pickup addresses of seller with following info:
-        pickup_address_id: Number representing pickup address ID
-        pickup_location_nickname: String representing short nickname of pickup location
-        address: String representing pickup address line
-        city: String representing pickup address city
-        state: String representing pickup address state
-        country: String representing pickup address country
-        pincode: 6-digit number representing pickup address pincode`,
+    Returns: Dictionary containing following info:
+        pickup_addresses: List of dictionary representing pickup addresses of seller with following info:
+            pickup_address_id: Number representing pickup address ID
+            pickup_location_nickname: String representing short nickname of pickup location
+            address: String representing pickup address line
+            city: String representing pickup address city
+            state: String representing pickup address state
+            country: String representing pickup address country
+            pincode: 6-digit number representing pickup address pincode
+        url: URL of page containing list of all pickup addresses`,
     {},
     toolWrapper(ApiCalls.listPickupAddresses)
   );

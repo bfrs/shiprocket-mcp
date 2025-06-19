@@ -10,3 +10,6 @@ export const API_DOMAINS = {
   SR_REPORT:
     process.env.API_BASE_SR_REPORT ?? "https://sr-report.shiprocket.in",
 };
+
+export const SR_APP_DOMAIN =
+  process.env.SR_APP_DOMAIN ?? "https://app.shiprocket.in";
