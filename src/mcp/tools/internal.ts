@@ -197,7 +197,7 @@ Don't call this tool incase for prepaid
 
   server.tool(
     "order_ship",
-    `Ship order by assigning courier to the order. If courier ID is not provided, this tool will respond with available courier list to ship the order.
+    `Ship order by assigning courier to the order. If courier ID is not provided, this tool will respond with available courier list for provided order ID.
 
     Args:
         order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'

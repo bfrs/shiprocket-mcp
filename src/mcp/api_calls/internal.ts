@@ -493,18 +493,27 @@ export const shipOrder = async (
       )
     ).data;
 
+    const couriers =
+      couriersData?.data?.available_courier_companies
+        ?.slice(0, 10)
+        ?.map((courier: Record<string, unknown>) => ({
+          courier_id: courier.courier_company_id,
+          courier_name_with_id: `${courier.courier_name} (ID: ${courier.courier_company_id})`,
+          shipping_cost: courier.rate,
+          courier_rating: courier.rating,
+          etd: courier.etd,
+        })) ?? [];
+
+    if (couriers.length === 0) {
+      return JSON.stringify({
+        success: false,
+        message: "No available couriers found for this particular order ID",
+      });
+    }
+
     return JSON.stringify({
       message: "Please select any courier from the couriers list provided",
-      couriers:
-        couriersData?.data?.available_courier_companies
-          ?.slice(0, 10)
-          ?.map((courier: Record<string, unknown>) => ({
-            courier_id: courier.courier_company_id,
-            courier_name_with_id: `${courier.courier_name} (ID: ${courier.courier_company_id})`,
-            shipping_cost: courier.rate,
-            courier_rating: courier.rating,
-            etd: courier.etd,
-          })) ?? [],
+      couriers,
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
