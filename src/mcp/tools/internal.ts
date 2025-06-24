@@ -201,12 +201,11 @@ Don't call this tool incase for prepaid
 
     Args:
         order_id: String representing alphanumeric ID which can be 'Shiprocket Order ID' or 'Channel Order ID'
-        courier_id: Optional number representing courier ID to assign shipment
         
     Returns: Dictionary containing success status and a status message`,
     {
       order_id: zod.string().min(1),
-      courier_id: zod.number().optional(),
+      // courier_id: zod.number().optional(),
     },
     toolWrapper(ApiCalls.shipOrder)
   );

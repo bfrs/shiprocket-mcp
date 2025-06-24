@@ -435,7 +435,7 @@ export const fetchOrders = async (
 export const shipOrder = async (
   args: {
     order_id: string;
-    courier_id?: number;
+    // courier_id?: number;
   },
   srToken: string
 ) => {
@@ -456,34 +456,15 @@ export const shipOrder = async (
 
     const srOrderId = orderDetails.data.id as number;
 
-    if (args.courier_id) {
-      const data = (
-        await axios.post(
-          shipOrderUrl,
-          {
-            oid: srOrderId,
-            courier_id: args.courier_id,
-            medium: "shiprocketMCP",
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${srToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
-      ).data;
-
-      return JSON.stringify({
-        success: true,
-        message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}.
-  Check order details using order detail page: ${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}}`,
-      });
-    }
-
-    const couriersData = (
-      await axios.get(
-        `${API_DOMAINS.SERVICEABILITY}/courier/serviceability?order_id=${srOrderId}`,
+    // if (args.courier_id) {
+    const data = (
+      await axios.post(
+        shipOrderUrl,
+        {
+          oid: srOrderId,
+          // courier_id: args.courier_id,
+          medium: "shiprocketMCP",
+        },
         {
           headers: {
             Authorization: `Bearer ${srToken}`,
@@ -493,28 +474,54 @@ export const shipOrder = async (
       )
     ).data;
 
-    const couriers =
-      couriersData?.data?.available_courier_companies
-        ?.slice(0, 10)
-        ?.map((courier: Record<string, unknown>) => ({
-          courier_id: courier.courier_company_id,
-          courier_name_with_id: `${courier.courier_name} (ID: ${courier.courier_company_id})`,
-          shipping_cost: courier.rate,
-          courier_rating: courier.rating,
-          etd: courier.etd,
-        })) ?? [];
-
-    if (couriers.length === 0) {
+    if (data?.response?.data) {
       return JSON.stringify({
         success: false,
-        message: "No available couriers found for this particular order ID",
+        message: data?.response?.data,
       });
     }
 
     return JSON.stringify({
-      message: "Please select any courier from the couriers list provided",
-      couriers,
+      success: true,
+      message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}.
+Check order details using order detail page: ${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}}`,
     });
+    // }
+
+    // const couriersData = (
+    //   await axios.get(
+    //     `${API_DOMAINS.SERVICEABILITY}/courier/serviceability?order_id=${srOrderId}`,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${srToken}`,
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   )
+    // ).data;
+
+    // const couriers =
+    //   couriersData?.data?.available_courier_companies
+    //     ?.slice(0, 10)
+    //     ?.map((courier: Record<string, unknown>) => ({
+    //       courier_id: courier.courier_company_id,
+    //       courier_name_with_id: `${courier.courier_name} (ID: ${courier.courier_company_id})`,
+    //       shipping_cost: courier.rate,
+    //       courier_rating: courier.rating,
+    //       etd: courier.etd,
+    //     })) ?? [];
+
+    // if (couriers.length === 0) {
+    //   return JSON.stringify({
+    //     success: false,
+    //     message: "No available couriers found for this particular order ID",
+    //   });
+    // }
+
+    // return JSON.stringify({
+    //   message: "Please select any courier from the couriers list provided",
+    //   couriers,
+    // });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
     return msg ?? "Unable to assign courier due to some error occurred";
