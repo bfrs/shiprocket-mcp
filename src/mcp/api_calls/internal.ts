@@ -474,7 +474,7 @@ export const shipOrder = async (
       )
     ).data;
 
-    if (data?.response?.data) {
+    if (typeof data?.response?.data === "string") {
       return JSON.stringify({
         success: false,
         message: data?.response?.data,
@@ -483,8 +483,9 @@ export const shipOrder = async (
 
     return JSON.stringify({
       success: true,
-      message: `Shipment assigned to ${data?.response?.data?.courier_name} with AWB code ${data?.response?.data?.awb_code}.
-Check order details using order detail page: ${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}}`,
+      courier_name: data?.response?.data?.courier_name,
+      assigned_awb: data?.response?.data?.awb_code,
+      url: `${SR_APP_DOMAIN}/seller/orders/details/${srOrderId}}`,
     });
     // }
 
@@ -574,7 +575,8 @@ export const orderSchedulePickup = async (
 
     return JSON.stringify({
       success: true,
-      message: `Shipment's pickup is scheduled on date ${pickupData?.response?.pickup_scheduled_date}. Check details on ${SR_APP_DOMAIN}/seller/orders/details/${orderDetails.data.id}`,
+      pickup_scheduled_date: pickupData?.response?.pickup_scheduled_date,
+      url: `${SR_APP_DOMAIN}/seller/orders/details/${orderDetails.data.id}`,
     });
   } catch (err) {
     const msg = err instanceof Error ? handleAxiosAPIErrorLogging(err) : null;
