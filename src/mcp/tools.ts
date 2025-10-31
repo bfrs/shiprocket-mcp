@@ -189,11 +189,13 @@ export const initializeTools = (server: McpServer) => {
 
   server.tool(
     "order_list",
-    `Get list of orders
-    
+    `Get list of orders with pagination support
+
     Args:
         status: Optional ENUM('NEW', 'READY_TO_SHIP', 'IN_TRANSIT', 'DELIVERED') representing status filter for orders
-        
+        page: Optional number representing the page number to fetch (default: 1)
+        per_page: Optional number representing the number of orders per page (default: 15, recommended max: 250)
+
     Return: List of dictionary containing following info:
         `,
     {
@@ -209,8 +211,10 @@ export const initializeTools = (server: McpServer) => {
           ])
         )
         .optional(),
+      page: zod.number().positive().optional(),
+      per_page: zod.number().positive().max(250).optional(),
     },
-    async ({ status }, context) => {
+    async ({ status, page, per_page }, context) => {
       let concatenatedStatusIds = "";
 
       switch (status) {
@@ -242,11 +246,24 @@ export const initializeTools = (server: McpServer) => {
 
       const { sellerToken } =
         connectionsBySessionId[context.sessionId ?? globalSessionId];
-      const url = `${
-        API_DOMAINS.SHIPROCKET
-      }/v1/external/orders?medium=shiprocketMCP${
-        status ? `&filter=${concatenatedStatusIds}&filter_by=status` : ""
-      }`;
+
+      // Build URL with pagination parameters
+      const params = new URLSearchParams({ medium: "shiprocketMCP" });
+
+      if (status) {
+        params.append("filter", concatenatedStatusIds);
+        params.append("filter_by", "status");
+      }
+
+      if (page) {
+        params.append("page", page.toString());
+      }
+
+      if (per_page) {
+        params.append("per_page", per_page.toString());
+      }
+
+      const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders?${params.toString()}`;
 
       try {
         const data = (
