@@ -4,6 +4,7 @@ import axios from "axios";
 import { connectionsBySessionId, globalSessionId } from "./connections";
 import { AxiosError } from "axios";
 import { API_DOMAINS } from "@/config";
+import { splitCustomerName } from "@/utils/nameUtils";
 
 export const initializeTools = (server: McpServer) => {
   server.tool(
@@ -679,7 +680,7 @@ export const initializeTools = (server: McpServer) => {
 
     Args:
         pickup_location_nickname: String representing short nickname of pickup location
-        customer_name: String representing name of the customer who placed order
+        customer_name: String representing full name of the customer who placed order (will be auto-split into first and last name; single names use same value for both)
         customer_email: String representing email of the customer who placed order
         customer_phone: 10-digit number representing phone number of the customer who placed order
         delivery_address: String representing customer address on which order will be delivered
@@ -729,6 +730,9 @@ export const initializeTools = (server: McpServer) => {
       const url = `${API_DOMAINS.SHIPROCKET}/v1/external/orders/create/adhoc`;
 
       try {
+        // Split customer name into first and last name for Shiprocket API
+        const { firstName, lastName } = splitCustomerName(args.customer_name);
+
         const data = (
           await axios.post(
             url,
@@ -738,7 +742,8 @@ export const initializeTools = (server: McpServer) => {
                 .padStart(4)}`,
               order_date: new Date().toLocaleDateString("en-CA"),
               pickup_location: args.pickup_location,
-              billing_customer_name: args.customer_name,
+              billing_customer_name: firstName,
+              billing_last_name: lastName,
               billing_address: args.delivery_address,
               billing_city: args.delivery_city,
               billing_pincode: args.delivery_pincode,
