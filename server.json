@@ -1,0 +1,38 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.bfrs/shiprocket-mcp",
+  "title": "Shiprocket",
+  "description": "MCP server for Shiprocket shipping and logistics integration, enabling AI agents to manage orders, track shipments, and handle logistics workflows",
+  "version": "1.0.0",
+  "homepage": "https://github.com/bfrs/shiprocket-mcp",
+  "repository": {
+    "url": "https://github.com/bfrs/shiprocket-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://shiprocket.in",
+  "tags": ["shipping", "logistics", "ecommerce", "shiprocket", "india", "tracking", "fulfillment", "courier"],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@iflow-mcp/bfrs-shiprocket-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "SHIPROCKET_EMAIL",
+          "description": "Shiprocket account email for authentication",
+          "isRequired": true,
+          "isSecret": false
+        },
+        {
+          "name": "SHIPROCKET_PASSWORD",
+          "description": "Shiprocket account password for authentication",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

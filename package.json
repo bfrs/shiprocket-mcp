@@ -1,6 +1,7 @@
 {
   "name": "shiprocket-mcp",
   "version": "1.0.0",
+  "mcpName": "io.github.bfrs/shiprocket-mcp",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register src/main.ts --watch",
