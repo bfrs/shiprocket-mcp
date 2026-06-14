@@ -83,6 +83,7 @@
     // "erasableSyntaxOnly": true,                       /* Do not allow runtime constructs that are not part of ECMAScript. */
     // "allowSyntheticDefaultImports": true,             /* Allow 'import x from y' when a module doesn't have a default export. */
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+    "ignoreDeprecations": "5.0",                         /* TypeScript only accepts the literal "5.0". The template error suggests the deprecatedIn version (6.0), but the option value must be "5.0" per TS source code (only "5.0" passes the `if (ignoreDeprecations === "5.0")` check). */
     // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
 
@@ -111,5 +112,11 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "vitest.config.ts"
+  ]
 }
