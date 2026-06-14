@@ -1,40 +1,40 @@
-import { API_DOMAINS } from "@/config";
-import { connectionsBySessionId, globalSessionId } from "@/mcp/connections";
+import { storeConnection, globalSessionId } from "@/mcp/connections";
 import { mcpServer } from "@/mcp/index";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import axios from "axios";
+import { createShiprocketClient } from "@/api/client";
+import { validateEnv } from "@/env";
+import { logger } from "@/logger";
 
 const transport = new StdioServerTransport();
 
 (async () => {
   try {
-    const sellerEmail = process.env.SELLER_EMAIL;
-    const sellerPassword = process.env.SELLER_PASSWORD;
+    const env = validateEnv();
 
-    if (!sellerEmail || !sellerPassword) {
-      throw new Error("Seller email and password is required in ENV");
+    const client = createShiprocketClient({
+      email: env.SELLER_EMAIL,
+      password: env.SELLER_PASSWORD,
+    });
+
+    await client.initialize();
+    logger.info("Shiprocket authentication successful via stdio transport");
+
+    storeConnection(globalSessionId, transport, client);
+    await mcpServer.connect(transport);
+
+    async function shutdown(signal: string): Promise<void> {
+      logger.info({ signal }, "Shutting down stdio transport...");
+      await transport.close();
+      process.exit(0);
     }
 
-    const url = `${API_DOMAINS.SHIPROCKET}/v1/external/auth/login`;
-    const data = (
-      await axios.post(url, { email: sellerEmail, password: sellerPassword })
-    ).data;
-
-    const sellerToken = data.token as string;
-
-    connectionsBySessionId[globalSessionId] = { transport, sellerToken };
-    await mcpServer.connect(transport);
+    process.on("SIGINT", () => void shutdown("SIGINT"));
+    process.on("SIGTERM", () => void shutdown("SIGTERM"));
   } catch (err) {
-    if (err instanceof axios.AxiosError) {
-      console.error({
-        success: false,
-        error: err.response?.data,
-      });
-    } else if (err instanceof Error) {
-      console.error({
-        success: false,
-        error: err.message,
-      });
+    if (err instanceof Error) {
+      logger.error({ error: err.message }, "Failed to start stdio transport");
+    } else {
+      logger.error({ error: String(err) }, "Failed to start stdio transport with non-Error throw");
     }
 
     process.exit(1);
