@@ -1,0 +1,32 @@
+# OMO Git Ignore
+# Files that should not be committed to git
+
+# Status files (auto-generated)
+status/*.yaml
+status/*.json
+
+# Logs
+logs/*.log
+logs/*.json
+
+# Run continuations
+run-continuation/*.json
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Generated plans (keep source plans)
+plans/*.draft.md
+plans/*.wip.md
+
+# Local configuration
+config.local.yaml
+config.*.local.yaml
+
+# Checkpoints (auto-generated)
+checkpoints/*.json
+checkpoints/*.md

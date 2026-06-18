@@ -1,0 +1,113 @@
+# OMO Workflow
+# Standard workflow for OhMyOpenCode projects
+
+name: aargo-lifecycle
+version: "1.0"
+description: "Standard workflow for Aargo Lifestyle Shiprocket integration"
+
+# Workflow stages
+stages:
+  - name: explore
+    description: "Explore codebase and understand current state"
+    required: true
+    tools:
+      - read
+      - grep
+      - glob
+    
+  - name: plan
+    description: "Create detailed plan with verification gates"
+    required: true
+    tools:
+      - write
+      - read
+    
+  - name: verify-plan
+    description: "Verify plan completeness and correctness"
+    required: true
+    tools:
+      - read
+      - lsp_diagnostics
+    
+  - name: execute
+    description: "Execute plan with atomic changes"
+    required: true
+    tools:
+      - edit
+      - write
+      - bash
+    
+  - name: verify-execution
+    description: "Verify execution results"
+    required: true
+    tools:
+      - lsp_diagnostics
+      - bash
+      - read
+    
+  - name: document
+    description: "Update documentation"
+    required: true
+    tools:
+      - write
+      - read
+
+# Gates
+gates:
+  - name: plan-approved
+    stage: plan
+    condition: "user_approval"
+    
+  - name: tests-passing
+    stage: verify-execution
+    condition: "all_tests_pass"
+    
+  - name: no-diagnostics
+    stage: verify-execution
+    condition: "zero_diagnostics"
+
+# Rollback triggers
+rollback:
+  - trigger: "tests-failing"
+    action: "revert_last_commit"
+  
+  - trigger: "diagnostics-present"
+    action: "fix_diagnostics"
+    
+  - trigger: "user-reject"
+    action: "revert_all_changes"
+
+# Notifications
+notifications:
+  on_complete:
+    - type: status
+      message: "Workflow complete"
+  
+  on_failure:
+    - type: alert
+      message: "Workflow failed - check logs"
+  
+  on_approval:
+    - type: prompt
+      message: "Plan ready for approval"
+
+# Project defaults
+defaults:
+  git_strategy: rebase
+  commit_style: conventional
+  test_style: atomic
+  doc_style: diataxis
+  
+  # Quality gates
+  quality:
+    require_tests: true
+    require_lint: true
+    require_types: true
+    require_docs: true
+  
+  # Safety
+  safety:
+    no_force_push: true
+    no_destructive_without_approval: true
+    no_commit_without_tests: true
+    no_bypass_gates: true

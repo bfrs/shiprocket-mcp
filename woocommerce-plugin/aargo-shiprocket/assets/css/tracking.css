@@ -1,0 +1,254 @@
+/* Tracking Page CSS */
+.aargo-tracking-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.aargo-tracking-form {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.aargo-tracking-form h2 {
+    margin-top: 0;
+    color: #1a1a1a;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+    background: #fff;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.form-group .required {
+    color: #d32f2f;
+}
+
+.btn-track.btn-return {
+    background: #388e3c;
+}
+
+.btn-track.btn-return:hover {
+    background: #2e7d32;
+}
+
+.btn-track {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.btn-track:hover {
+    background: #005a87;
+}
+
+.aargo-tracking-results {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.tracking-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.tracking-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+}
+
+.tracking-status {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.tracking-status.shipped {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.tracking-status.delivered {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.tracking-status.out-for-delivery {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.tracking-status.undelivered {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.tracking-info {
+    margin-bottom: 25px;
+}
+
+.info-row {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row .label {
+    font-weight: 600;
+    width: 150px;
+    color: #666;
+}
+
+.tracking-timeline {
+    margin-top: 25px;
+}
+
+.tracking-timeline h4 {
+    margin-bottom: 15px;
+}
+
+.timeline-item {
+    display: flex;
+    padding: 15px 0;
+    border-left: 3px solid #007cba;
+    padding-left: 20px;
+    margin-left: 10px;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #007cba;
+    border-radius: 50%;
+    position: absolute;
+    left: -7px;
+    top: 18px;
+}
+
+.timeline-item.completed {
+    border-left-color: #4caf50;
+}
+
+.timeline-item.completed::before {
+    background: #4caf50;
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-status {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.timeline-location {
+    color: #666;
+    font-size: 14px;
+}
+
+.timeline-date {
+    color: #999;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.tracking-actions {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.btn-track-external {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-track-external:hover {
+    background: #e0e0e0;
+}
+
+.aargo-tracking-error {
+    background: #ffebee;
+    padding: 20px;
+    border-radius: 8px;
+    color: #d32f2f;
+}
+
+.aargo-tracking-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .aargo-tracking-container {
+        padding: 10px;
+    }
+    
+    .aargo-tracking-form {
+        padding: 20px;
+    }
+    
+    .info-row {
+        flex-direction: column;
+    }
+    
+    .info-row .label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}

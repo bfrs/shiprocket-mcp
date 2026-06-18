@@ -1,0 +1,37 @@
+- generic [ref=e3]:
+  - link "Image" [ref=e5] [cursor=pointer]:
+    - /url: "#"
+    - img "Image" [ref=e6]
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - heading "Login To Shiprocket Using" [level=3] [ref=e10]
+      - generic [ref=e11]:
+        - generic [ref=e13] [cursor=pointer]:
+          - img "google" [ref=e14]
+          - text: Google
+        - generic [ref=e16] [cursor=pointer]:
+          - img "Shopify" [ref=e17]
+          - text: Shopify
+        - generic [ref=e19] [cursor=pointer]:
+          - img "phone" [ref=e20]
+          - text: Phone No
+      - paragraph [ref=e22]: or
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]: Email ID
+            - textbox "Enter your Email ID" [ref=e29]
+          - generic [ref=e30]:
+            - generic [ref=e31]: Password
+            - textbox "Enter Password" [ref=e32]
+            - img "eye close" [ref=e34] [cursor=pointer]
+        - generic [ref=e36]: Forgot Password?
+        - button "Login" [ref=e39] [cursor=pointer]
+        - generic [ref=e41]:
+          - generic [ref=e42]: New to Shiprocket?
+          - generic [ref=e43] [cursor=pointer]: Signup Now
+    - generic [ref=e45]:
+      - heading "Download Our App" [level=3] [ref=e47]
+      - generic [ref=e48]:
+        - img "iocn" [ref=e50] [cursor=pointer]
+        - img "iocn" [ref=e52] [cursor=pointer]

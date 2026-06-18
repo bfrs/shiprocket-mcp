@@ -1,0 +1,22 @@
+[    1488ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/get/version:0
+[    1497ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/vas/checkEligibility?is_web=1&vas_name=revenue_assured&company_id=undefined:0
+[    1511ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/auth/login/user?is_web=1:0
+[    1530ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/vas/isVasSubscribed?vas_name=ndr_monetisation&company_id=:0
+[    1531ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/vas/vas-subscription-summary:0
+[    1532ms] [ERROR] Failed to calculate VAS Score: E2 @ https://sr-sidebar.shiprocket.in/main.js:0
+[    1540ms] [ERROR] ERROR E2 @ https://sr-sidebar.shiprocket.in/main.js:0
+[    1542ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/settings/menuv2?is_web=1:0
+[    1560ms] [ERROR] ERROR {message: Wrong number of segments, status_code: 401} @ https://app.shiprocket.in/seller/chunk-NZXLD3NS.js:6
+[    1560ms] [ERROR] ERROR {message: Wrong number of segments, status_code: 401} @ https://app.shiprocket.in/seller/chunk-NZXLD3NS.js:6
+[    1645ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/courier/applied_weight?isRefresh=1&is_web=1:0
+[    1651ms] [ERROR] ERROR E2 @ https://sr-sidebar.shiprocket.in/main.js:0
+[    1713ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://apiv2.shiprocket.co/v1/shiprocket-pilot/get-dashboard-update?is_web=1&type=count:0
+[    1832ms] [WARNING] <link rel=preload> has an invalid `href` value @ https://app.shiprocket.in/newlogin?routestate=seller%2F:9
+[    1914ms] [LOG] No pending requests to replay @ https://app.shiprocket.in/sr_login/serviceworker.js:1
+[    1965ms] [LOG] [AnalyticsService] Initializing analytics service... @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    1966ms] [LOG] [AnalyticsRegistry] Initializing providers... @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    1980ms] [LOG] [AnalyticsRegistry] All providers initialized successfully @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    1981ms] [LOG] [AnalyticsService] Analytics service initialized successfully @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    2184ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://app.shiprocket.in/wp-content/themes/shiprocket/assets/img/sprite.svg#icon-arrow-left:0
+[    2906ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 731503586965557. @ https://connect.facebook.net/en_US/fbevents.js:183
+[    5139ms] Transition was skipped

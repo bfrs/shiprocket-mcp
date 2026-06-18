@@ -1,0 +1,527 @@
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - link "Image" [ref=e9] [cursor=pointer]:
+        - /url: "#"
+        - img "Image" [ref=e10]
+      - generic [ref=e11]:
+        - heading "We are more than just a shipping partner" [level=2] [ref=e12]:
+          - text: We are more than
+          - paragraph [ref=e13]: just a shipping partner
+        - img "checkCircle" [ref=e15]
+      - paragraph [ref=e17]: Trusted by teams at
+      - img "logos" [ref=e21]
+    - generic [ref=e27]:
+      - heading "For Business" [level=3] [ref=e29]
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e33]:
+            - generic [ref=e34]: "+91"
+            - generic [ref=e35]:
+              - textbox "Enter your 10 digit mobile number" [ref=e36]
+              - generic: Phone Number
+          - button "Continue" [disabled] [ref=e39]
+          - generic [ref=e42]:
+            - text: By clicking on Continue, I accept the
+            - link "Terms & Conditions" [ref=e43] [cursor=pointer]:
+              - /url: https://www.shiprocket.in/merchant-agreement/
+            - text: and
+            - link "Privacy Policy." [ref=e44] [cursor=pointer]:
+              - /url: https://www.shiprocket.in/privacy-policy/
+          - generic [ref=e45]:
+            - generic [ref=e46]: OR
+            - paragraph [ref=e47]
+          - generic [ref=e48]:
+            - generic [ref=e50] [cursor=pointer]:
+              - img "google" [ref=e51]
+              - text: Google
+            - generic [ref=e53] [cursor=pointer]:
+              - img "Shopify" [ref=e54]
+              - text: Shopify
+            - generic [ref=e56] [cursor=pointer]:
+              - img "email" [ref=e57]
+              - text: Email
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - heading "For Order Tracking" [level=5] [ref=e60]
+            - generic [ref=e64]:
+              - generic [ref=e65]:
+                - heading "Know when your order will arrive" [level=6] [ref=e66]
+                - paragraph [ref=e67]: Enter details to track order
+              - generic [ref=e69]:
+                - generic [ref=e70]:
+                  - generic [ref=e71] [cursor=pointer]: Mobile Number
+                  - generic [ref=e73] [cursor=pointer]: Order Id
+                  - generic [ref=e75] [cursor=pointer]: AWB
+                - generic [ref=e78]:
+                  - paragraph [ref=e79]: You will be redirected to myShiprocket to track all your orders.
+                  - button "Track Now" [ref=e80] [cursor=pointer]
+          - heading "Are you a logistic provider? Request for Franchise" [level=5] [ref=e81]
+  - generic [ref=e83]:
+    - generic [ref=e84]:
+      - heading "Powering growth for 3,00,000+ businesses" [level=3] [ref=e90]:
+        - text: Powering growth for
+        - strong [ref=e91]: 3,00,000+
+        - text: businesses
+      - list [ref=e93]:
+        - generic [ref=e95]:
+          - listitem [ref=e96]:
+            - img "logo" [ref=e97]
+          - listitem [ref=e98]:
+            - img "logo" [ref=e99]
+          - listitem [ref=e100]:
+            - img "logo" [ref=e101]
+          - listitem [ref=e102]:
+            - img "logo" [ref=e103]
+          - listitem [ref=e104]:
+            - img "logo" [ref=e105]
+          - listitem [ref=e106]:
+            - img "logo" [ref=e107]
+          - listitem [ref=e108]:
+            - img "logo" [ref=e109]
+          - listitem [ref=e110]:
+            - img "logo" [ref=e111]
+          - listitem [ref=e112]:
+            - img "logo" [ref=e113]
+          - listitem [ref=e114]:
+            - img "logo" [ref=e115]
+          - listitem [ref=e116]:
+            - img "logo" [ref=e117]
+          - listitem [ref=e118]:
+            - img "logo" [ref=e119]
+          - listitem [ref=e120]:
+            - img "logo" [ref=e121]
+          - listitem [ref=e122]:
+            - img "logo" [ref=e123]
+          - listitem [ref=e124]:
+            - img "logo" [ref=e125]
+          - listitem [ref=e126]:
+            - img "logo" [ref=e127]
+    - generic [ref=e128]:
+      - generic [ref=e133]:
+        - heading "We Are More than Just a Shipping Partner" [level=2] [ref=e134]:
+          - text: We Are More than Just a
+          - text: Shipping Partner
+        - paragraph [ref=e135]: We equip your business with all the tech needed to ship your eCommerce dream —shipping, marketing, financing and more
+      - generic [ref=e141]:
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]:
+              - generic [ref=e147]:
+                - strong [ref=e148]: "1"
+                - text: /4
+              - img [ref=e149]
+            - heading "Unified domestic shipping services" [level=3] [ref=e151]
+          - generic [ref=e152]:
+            - generic [ref=e153]:
+              - img [ref=e155]
+              - generic [ref=e156]:
+                - heading "Shipping" [level=5] [ref=e157]:
+                  - generic [ref=e158]:
+                    - img [ref=e159]
+                    - text: Shipping
+                  - link:
+                    - /url: https://www.shiprocket.in/shipping
+                    - img
+                - paragraph [ref=e160]: Automated nationwide shipping at ₹20/500gms*
+                - link "Sign Up" [ref=e161] [cursor=pointer]:
+                  - /url: https://app.shiprocket.in/register
+                  - text: Sign Up
+                  - img [ref=e162]
+            - generic [ref=e163]:
+              - img [ref=e165]
+              - generic [ref=e166]:
+                - heading "Quick" [level=5] [ref=e167]:
+                  - generic [ref=e168]:
+                    - img [ref=e169]
+                    - text: Quick
+                  - link [ref=e170] [cursor=pointer]:
+                    - /url: https://www.shiprocket.in/quick
+                    - img [ref=e171]
+                - paragraph [ref=e172]: Fastest local deliveries to multiple destinations
+                - link "Sign Up" [ref=e173] [cursor=pointer]:
+                  - /url: https://app.shiprocket.in/seller/quick/create-order
+                  - text: Sign Up
+                  - img [ref=e174]
+            - generic [ref=e175]:
+              - img [ref=e177]
+              - generic [ref=e178]:
+                - heading "Cargo" [level=5] [ref=e179]:
+                  - generic [ref=e180]:
+                    - img [ref=e181]
+                    - text: Cargo
+                  - link:
+                    - /url: https://cargo.shiprocket.in/
+                    - img
+                - paragraph [ref=e182]: B2B & bulk shipping across India, starts at ₹6/Kg*
+                - link "Sign Up" [ref=e183] [cursor=pointer]:
+                  - /url: https://app.shiprocket.in/register?source=rb
+                  - text: Sign Up
+                  - img [ref=e184]
+            - generic [ref=e185]:
+              - img [ref=e187]
+              - generic [ref=e188]:
+                - heading "Fulfillment" [level=5] [ref=e189]:
+                  - generic [ref=e190]:
+                    - img [ref=e191]
+                    - text: Fulfillment
+                  - link:
+                    - /url: https://fulfillment.shiprocket.in/
+                    - img
+                - paragraph [ref=e192]: Warehousing facilities including packaging and shipping
+                - link "Sign Up" [ref=e193] [cursor=pointer]:
+                  - /url: https://fulfillment.shiprocket.in/request-quote/
+                  - text: Sign Up
+                  - img [ref=e194]
+        - generic [ref=e197]:
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - strong [ref=e201]: "2"
+                - text: /4
+              - img [ref=e202]
+            - heading "Full-stack global enablement" [level=3] [ref=e204]
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - img [ref=e208]
+              - generic [ref=e209]:
+                - heading "ShipX" [level=5] [ref=e210]:
+                  - generic [ref=e211]:
+                    - img [ref=e212]
+                    - text: ShipX
+                  - link:
+                    - /url: https://www.shiprocket.in/x/
+                    - img
+                - paragraph [ref=e213]: Cross-border shipping worldwide
+                - link "Sign Up" [ref=e214] [cursor=pointer]:
+                  - /url: https://app.shiprocket.in/register?source=srx
+                  - text: Sign Up
+                  - img [ref=e215]
+            - generic [ref=e216]:
+              - img [ref=e218]
+              - generic [ref=e219]:
+                - heading "CargoX" [level=5] [ref=e220]:
+                  - generic [ref=e221]:
+                    - img [ref=e222]
+                    - text: CargoX
+                  - link:
+                    - /url: https://www.shiprocket.in/x/cargox
+                    - img
+                - paragraph [ref=e223]: Reliable B2B & bulk shipping across borders
+                - link "Sign Up" [ref=e224] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/x/cargox
+                  - text: Sign Up
+                  - img [ref=e225]
+            - generic [ref=e226]:
+              - img [ref=e228]
+              - generic [ref=e229]:
+                - heading "LaunchX" [level=5] [ref=e230]:
+                  - generic [ref=e231]:
+                    - img [ref=e232]
+                    - text: LaunchX
+                  - link:
+                    - /url: https://www.shiprocket.in/x/launchx
+                    - img
+                - paragraph [ref=e233]: Cross-border trade enablement support
+                - link "Sign Up" [ref=e234] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/x/launchx
+                  - text: Sign Up
+                  - img [ref=e235]
+        - generic [ref=e238]:
+          - generic [ref=e239]:
+            - generic [ref=e240]:
+              - generic [ref=e241]:
+                - strong [ref=e242]: "3"
+                - text: /4
+              - img [ref=e243]
+            - heading "AI-powered tools for marketing growth" [level=3] [ref=e245]
+          - generic [ref=e246]:
+            - generic [ref=e247]:
+              - img [ref=e249]
+              - generic [ref=e250]:
+                - heading "Checkout" [level=5] [ref=e251]:
+                  - generic [ref=e252]:
+                    - img [ref=e253]
+                    - text: Checkout
+                  - link:
+                    - /url: https://checkout.shiprocket.in/
+                    - img
+                - paragraph [ref=e254]: Effortless one-click checkout solution
+                - link "Sign Up" [ref=e255] [cursor=pointer]:
+                  - /url: https://checkout.shiprocket.in/lead-form/
+                  - text: Sign Up
+                  - img [ref=e256]
+            - generic [ref=e257]:
+              - img [ref=e259]
+              - generic [ref=e260]:
+                - heading "Engage360" [level=5] [ref=e261]:
+                  - generic [ref=e262]:
+                    - img [ref=e263]
+                    - text: Engage360
+                  - link:
+                    - /url: https://www.shiprocket.in/engage360
+                    - img
+                - paragraph [ref=e264]: WhatsApp-centric marketing solution
+                - link "Sign Up" [ref=e265] [cursor=pointer]:
+                  - /url: https://app-engage.shiprocket.in/auth/register
+                  - text: Sign Up
+                  - img [ref=e266]
+            - generic [ref=e267]:
+              - img [ref=e269]
+              - generic [ref=e270]:
+                - heading "Promise" [level=5] [ref=e271]:
+                  - generic [ref=e272]:
+                    - img [ref=e273]
+                    - text: Promise
+                  - link:
+                    - /url: https://www.shiprocket.in/promise
+                    - img
+                - paragraph [ref=e274]: EDD & trust badges for e-commerce
+                - link "Sign Up" [ref=e275] [cursor=pointer]:
+                  - /url: https://apps.shopify.com/shiprocket-promise-app
+                  - text: Sign Up
+                  - img [ref=e276]
+            - generic [ref=e277]:
+              - img [ref=e279]
+              - generic [ref=e280]:
+                - heading "Trends" [level=5] [ref=e281]:
+                  - generic [ref=e282]:
+                    - img [ref=e283]
+                    - text: Trends
+                  - link [ref=e284] [cursor=pointer]:
+                    - /url: https://trends.shiprocket.in/
+                    - img [ref=e285]
+                - paragraph [ref=e286]: Market insights and buyer purchase profiling
+                - link "Sign Up" [ref=e287] [cursor=pointer]:
+                  - /url: https://trends.shiprocket.in/
+                  - text: Sign Up
+                  - img [ref=e288]
+        - generic [ref=e291]:
+          - generic [ref=e292]:
+            - generic [ref=e293]:
+              - generic [ref=e294]:
+                - strong [ref=e295]: "4"
+                - text: /4
+              - img [ref=e296]
+            - heading "Capital and financial tools" [level=3] [ref=e298]
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - img [ref=e302]
+              - generic [ref=e303]:
+                - heading "Capital" [level=5] [ref=e304]:
+                  - generic [ref=e305]:
+                    - img [ref=e306]
+                    - text: Capital
+                  - link:
+                    - /url: https://www.shiprocket.in/capital
+                    - img
+                - paragraph [ref=e307]: Financial services for business growth
+                - link "Sign Up" [ref=e308] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/capital
+                  - text: Sign Up
+                  - img [ref=e309]
+            - generic [ref=e310]:
+              - img [ref=e312]
+              - generic [ref=e313]:
+                - heading "Credit score" [level=5] [ref=e314]:
+                  - generic [ref=e315]:
+                    - img [ref=e316]
+                    - text: Credit score
+                  - link:
+                    - /url: https://www.shiprocket.in/#
+                    - img
+                - paragraph [ref=e317]:
+                  - text: Check your credit score
+                  - text: for free
+                - link "Sign Up" [ref=e318] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/#
+                  - text: Sign Up
+                  - img [ref=e319]
+    - generic [ref=e323]:
+      - generic [ref=e324]:
+        - heading "Which Businesses Can Benefit from Shiprocket?" [level=2] [ref=e325]:
+          - text: Which Businesses Can Benefit
+          - text: from Shiprocket?
+        - paragraph [ref=e326]: If your business resonates with any of the below, the answer is a definite ‘YES’!
+      - generic [ref=e327]:
+        - generic [ref=e328]:
+          - generic [ref=e329]:
+            - heading "SMB Online retailers" [level=3] [ref=e330]
+            - paragraph [ref=e331]: D2C brands, traders & drop shippers selling through their own website
+            - generic [ref=e332]:
+              - paragraph [ref=e333]: Products used frequently
+              - generic [ref=e334]:
+                - link "Shipping" [ref=e335] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/shipping/
+                  - img [ref=e336]
+                  - text: Shipping
+                  - img [ref=e337]
+                - link "ShipX" [ref=e338] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/x/
+                  - img [ref=e339]
+                  - text: ShipX
+                  - img [ref=e340]
+                - link "Checkout" [ref=e341] [cursor=pointer]:
+                  - /url: https://checkout.shiprocket.in/
+                  - img [ref=e342]
+                  - text: Checkout
+                  - img [ref=e343]
+                - link "Engage360" [ref=e344] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/engage360
+                  - img [ref=e345]
+                  - text: Engage360
+                  - img [ref=e346]
+            - generic [ref=e347]:
+              - generic [ref=e348]:
+                - paragraph [ref=e349]: Conversion increase of upto
+                - heading "20%" [level=4] [ref=e350]
+              - generic [ref=e351]:
+                - paragraph [ref=e352]: Cost reduction by
+                - heading "10-12%" [level=4] [ref=e353]
+          - img "img" [ref=e355]
+        - generic [ref=e356]:
+          - generic [ref=e357]:
+            - heading "Social sellers" [level=3] [ref=e358]
+            - paragraph [ref=e359]: Entrepreneurs selling on Instagram, WhatsApp, Facebook etc.
+            - generic [ref=e360]:
+              - paragraph [ref=e361]: Products used frequently
+              - generic [ref=e362]:
+                - link "Shipping" [ref=e363] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/shipping/
+                  - img [ref=e364]
+                  - text: Shipping
+                  - img [ref=e365]
+                - link "Quick" [ref=e366] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/quick
+                  - img [ref=e367]
+                  - text: Quick
+                  - img [ref=e368]
+                - link "Engage360" [ref=e369] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/engage360
+                  - img [ref=e370]
+                  - text: Engage360
+                  - img [ref=e371]
+            - generic [ref=e372]:
+              - generic [ref=e373]:
+                - paragraph [ref=e374]: Cost reductions to
+                - heading "10-12%" [level=4] [ref=e375]
+              - generic [ref=e376]:
+                - paragraph [ref=e377]: Uplift buyer
+                - heading "experience" [level=4] [ref=e378]
+          - img "img" [ref=e380]
+        - generic [ref=e381]:
+          - generic [ref=e382]:
+            - heading "Offline stores" [level=3] [ref=e383]
+            - paragraph [ref=e384]: Retailers, brand stores
+            - generic [ref=e385]:
+              - paragraph [ref=e386]: Products used frequently
+              - generic [ref=e387]:
+                - link "Shipping" [ref=e388] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/shipping
+                  - img [ref=e389]
+                  - text: Shipping
+                  - img [ref=e390]
+                - link "Quick" [ref=e391] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/quick
+                  - img [ref=e392]
+                  - text: Quick
+                  - img [ref=e393]
+                - link "ShipX" [ref=e394] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/x/
+                  - img [ref=e395]
+                  - text: ShipX
+                  - img [ref=e396]
+                - link "Capital" [ref=e397] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/capital
+                  - img [ref=e398]
+                  - text: Capital
+                  - img [ref=e399]
+            - generic [ref=e400]:
+              - generic [ref=e401]:
+                - paragraph [ref=e402]: Cost reduction by
+                - heading "10-12%" [level=4] [ref=e403]
+              - generic [ref=e404]:
+                - paragraph [ref=e405]: Uplift buyer
+                - heading "experience" [level=4] [ref=e406]
+          - img "img" [ref=e408]
+        - generic [ref=e409]:
+          - generic [ref=e410]:
+            - heading "Large online & offline businesses" [level=3] [ref=e411]
+            - paragraph [ref=e412]: Brands & sellers having multiple sales channels - website, stores etc.
+            - generic [ref=e413]:
+              - paragraph [ref=e414]: Products used frequently
+              - generic [ref=e415]:
+                - link "Shipping" [ref=e416] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/shipping
+                  - img [ref=e417]
+                  - text: Shipping
+                  - img [ref=e418]
+                - link "Quick" [ref=e419] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/quick
+                  - img [ref=e420]
+                  - text: Quick
+                  - img [ref=e421]
+                - link "Checkout" [ref=e422] [cursor=pointer]:
+                  - /url: https://checkout.shiprocket.in/
+                  - img [ref=e423]
+                  - text: Checkout
+                  - img [ref=e424]
+                - link "Capital" [ref=e425] [cursor=pointer]:
+                  - /url: https://www.shiprocket.in/capital
+                  - img [ref=e426]
+                  - text: Capital
+                  - img [ref=e427]
+            - generic [ref=e429]:
+              - paragraph [ref=e430]: Business optimisation cost saving upto
+              - heading "10%" [level=4] [ref=e431]
+          - img "img" [ref=e433]
+    - generic [ref=e434]:
+      - heading "Seamless Integrations with 220+ Digital Platforms" [level=2] [ref=e439]:
+        - text: Seamless Integrations with
+        - text: 220+ Digital Platforms
+      - generic [ref=e440]:
+        - list [ref=e442]:
+          - generic [ref=e444]:
+            - listitem [ref=e445]:
+              - img [ref=e446]
+            - listitem [ref=e447]:
+              - img [ref=e448]
+            - listitem [ref=e449]:
+              - img [ref=e450]
+            - listitem [ref=e451]:
+              - img [ref=e452]
+            - listitem [ref=e453]:
+              - img [ref=e454]
+            - listitem [ref=e455]:
+              - img [ref=e456]
+            - listitem [ref=e457]:
+              - img [ref=e458]
+            - listitem [ref=e459]:
+              - img [ref=e460]
+        - list [ref=e462]:
+          - generic [ref=e464]:
+            - listitem [ref=e465]:
+              - img [ref=e466]
+            - listitem [ref=e467]:
+              - img [ref=e468]
+            - listitem [ref=e469]:
+              - img [ref=e470]
+            - listitem [ref=e471]:
+              - img [ref=e472]
+            - listitem [ref=e473]:
+              - img [ref=e474]
+            - listitem [ref=e475]:
+              - img [ref=e476]
+            - listitem [ref=e477]:
+              - img [ref=e478]
+            - listitem [ref=e479]:
+              - img [ref=e480]
+            - listitem [ref=e481]:
+              - img [ref=e482]
+    - generic [ref=e485]:
+      - generic [ref=e486]:
+        - heading "Ship Delightful Experiences With Shiprocket" [level=6] [ref=e487]:
+          - text: Ship Delightful Experiences
+          - text: With Shiprocket
+        - button "Sign up for free" [ref=e488] [cursor=pointer]
+      - img [ref=e490]

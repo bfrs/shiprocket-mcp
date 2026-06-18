@@ -1,0 +1,35 @@
+# OMO Configuration - Lightweight
+# Minimal config for OhMyOpenCode compliance
+
+project: aargo-lifestyle
+type: e-commerce
+
+# Verification
+verify:
+  before_execution: true
+  before_commit: true
+  check_diagnostics: true
+  require_tests: true
+
+# Deployment
+deploy:
+  mcp_server:
+    port: 3000
+    node: ">=20.0.0 <23.0.0"
+  woocommerce:
+    php: "7.4+"
+    wp: "5.8+"
+    wc: "6.0+"
+
+# Security
+security:
+  require_auth: true
+  allowed_origins:
+    - "https://aargolifestyle.com"
+    - "http://localhost:*"
+
+# Rollback
+rollback:
+  enabled: true
+  backup: true
+  max_history: 5

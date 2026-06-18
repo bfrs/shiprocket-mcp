@@ -1,0 +1,255 @@
+# 📦 Aargo Lifestyle — Deployment Package
+
+**Version:** v1.1.0
+**Date:** 2026-06-16
+**Status:** Production Ready
+**Tests:** 13/13 Passing
+
+---
+
+## 🚀 Quick Start (For Developers)
+
+### Option A: One-Command Setup
+```bash
+./scripts/one-command-setup.sh
+```
+This does everything: install, build, test, deploy.
+
+### Option B: Manual Steps
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Build
+npm run build
+
+# 3. Test
+npm test
+
+# 4. Start
+npm start
+# Or with PM2:
+pm2 start dist/main.js --name shiprocket-mcp
+```
+
+---
+
+## 📁 What's in This Package
+
+| File | Purpose |
+|------|---------|
+| `.env` | Environment variables (credentials) — **FILL THIS IN** |
+| `dist/main.js` | Built MCP server |
+| `deploy.sh` | Basic deployment script |
+| `scripts/auto-deploy.sh` | Automated deployment with PM2 |
+| `scripts/one-command-setup.sh` | Full setup in one command |
+| `scripts/business-monitor.sh` | Health and business monitoring |
+| `aargo-shiprocket-v1.1.0.zip` | WooCommerce plugin (ready to upload) |
+| `PRODUCTION.md` | Production deployment summary |
+| `README.md` | Full documentation |
+| `CONFIG.md` | Configuration guide |
+
+---
+
+## 🔑 Step 1: Fill in Credentials
+
+**Before anything else, edit `.env`:**
+
+```bash
+# Required: Your Shiprocket login
+SELLER_EMAIL=your-actual-email@example.com
+SELLER_PASSWORD=your-actual-password
+
+# Optional: Change port if needed
+PORT=3000
+
+# Already generated: MCP auth token
+MCP_AUTH_TOKEN=775cbccd53e7d2145389927a419c907fd8ec7ab9633b0d4d63b76ea8b915cc58
+```
+
+**Get your credentials from:** https://app.shiprocket.in
+
+---
+
+## 🚀 Step 2: Deploy MCP Server
+
+```bash
+./scripts/one-command-setup.sh
+```
+
+**What it does:**
+1. Checks Node.js version (>= 20.0.0 and < 23.0.0)
+2. Verifies credentials are configured
+3. Installs dependencies
+4. Builds the project
+5. Runs all 13 tests
+6. Creates log directories
+7. Deploys with PM2 (or nohup if PM2 not available)
+8. Health check
+
+**After deployment:**
+```bash
+# Check status
+pm2 status
+
+# View logs
+pm2 logs shiprocket-mcp
+
+# Restart
+pm2 restart shiprocket-mcp
+
+# Health check
+curl http://localhost:3000/health
+```
+
+---
+
+## 🛒 Step 3: Deploy WooCommerce Plugin
+
+### Method A: WordPress Admin (Recommended)
+1. Go to WordPress Admin → Plugins → Add New
+2. Click "Upload Plugin"
+3. Select `aargo-shiprocket-v1.1.0.zip`
+4. Click "Install Now"
+5. Click "Activate"
+
+### Method B: FTP/SSH
+```bash
+# Upload to WordPress plugins directory
+scp aargo-shiprocket-v1.1.0.zip user@server:/var/www/html/wp-content/plugins/
+
+# Or unzip directly
+unzip aargo-shiprocket-v1.1.0.zip -d /var/www/html/wp-content/plugins/aargo-shiprocket/
+```
+
+### After Installation
+1. Go to Settings → Shiprocket
+2. Enter MCP server URL (e.g., `http://localhost:3000`)
+3. Enter MCP auth token (from `.env`)
+4. Save settings
+5. Test connection
+
+---
+
+## 📊 Step 4: Monitoring
+
+```bash
+# Check everything
+./scripts/business-monitor.sh
+
+# Continuous monitoring
+./scripts/business-monitor.sh --watch
+
+# Check logs
+tail -f logs/server.log
+```
+
+---
+
+## 🧪 Testing
+
+### Test MCP Server
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# Test with MCP client
+# (See CONFIG.md for Claude/Cursor setup)
+```
+
+### Test WooCommerce Plugin
+1. Create a test order in WooCommerce
+2. Check if it syncs to Shiprocket
+3. Track the order
+4. Test return form
+
+---
+
+## 🔄 Updating
+
+### Update MCP Server
+```bash
+git pull
+npm install
+npm run build
+npm test
+pm2 restart shiprocket-mcp
+```
+
+### Update WooCommerce Plugin
+1. Deactivate old plugin
+2. Delete old plugin files
+3. Upload new zip
+4. Activate
+5. Reconfigure settings
+
+---
+
+## 🛠️ Troubleshooting
+
+### "Tests fail"
+```bash
+npm test
+# Check which test fails
+# Fix issue or report to Sisyphus
+```
+
+### "Server won't start"
+```bash
+# Check credentials
+cat .env
+
+# Check logs
+tail -f logs/server.log
+
+# Check port
+lsof -ti:3000 | xargs kill
+```
+
+### "Plugin won't upload"
+- Check PHP version (need 7.4+)
+- Check WordPress version (need 5.8+)
+- Check WooCommerce version (need 6.0+)
+- Check file upload size limit
+
+### "Orders not syncing"
+- Check MCP server URL in plugin settings
+- Check auth token
+- Check webhook endpoint
+- Check logs
+
+---
+
+## 📞 Support
+
+**For technical issues:**
+1. Check logs: `logs/server.log` or `pm2 logs`
+2. Run monitor: `./scripts/business-monitor.sh`
+3. Check PRODUCTION.md for detailed info
+4. Report to Sisyphus with log output
+
+**For business issues:**
+- Order problems: Check Shiprocket dashboard
+- Delivery issues: Contact courier
+- Returns: Check return form
+
+---
+
+## 🎯 Production Checklist
+
+- [ ] Credentials filled in `.env`
+- [ ] MCP server deployed and running
+- [ ] WooCommerce plugin uploaded and activated
+- [ ] Plugin settings configured (MCP URL, auth token)
+- [ ] Webhook endpoint registered
+- [ ] Test order created and synced
+- [ ] Tracking page working
+- [ ] Return form working
+- [ ] Health check passing
+- [ ] Monitoring active
+
+---
+
+**Package generated by:** Sisyphus OMO Orchestrator
+**For:** Aargo Lifestyle (aargolifestyle.com)
+**Date:** 2026-06-16

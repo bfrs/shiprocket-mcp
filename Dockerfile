@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+RUN npm run build && npx esbuild src/main.ts --bundle --platform=node --outfile=dist/bundle.js --format=cjs
 
 # Production stage
 FROM node:22-alpine AS runner
@@ -17,8 +17,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/dist/bundle.js ./dist/bundle.js
 
 # Set production environment
 ENV NODE_ENV=production
@@ -32,4 +31,4 @@ USER node
 
 EXPOSE 3000
 
-CMD ["node", "-r", "tsconfig-paths/register", "dist/main.js"]
+CMD ["node", "dist/bundle.js"]

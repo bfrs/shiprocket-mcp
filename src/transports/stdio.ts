@@ -1,7 +1,8 @@
 import { storeConnection, globalSessionId } from "@/mcp/connections";
 import { mcpServer } from "@/mcp/index";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createShiprocketClient } from "@/api/client";
+import { ShiprocketClient } from "@/api/client";
+import { ShiprocketAuth } from "@/api/auth";
 import { validateEnv } from "@/env";
 import { logger } from "@/logger";
 
@@ -11,10 +12,12 @@ const transport = new StdioServerTransport();
   try {
     const env = validateEnv();
 
-    const client = createShiprocketClient({
+    const auth = new ShiprocketAuth({
       email: env.SELLER_EMAIL,
       password: env.SELLER_PASSWORD,
+      sellerToken: env.SELLER_TOKEN,
     });
+    const client = new ShiprocketClient({ auth });
 
     await client.initialize();
     logger.info("Shiprocket authentication successful via stdio transport");

@@ -1,0 +1,19 @@
+[     994ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://app.shiprocket.in/js/jquery/jquery-latest2.min.js:0
+[    4206ms] [WARNING] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading @ https://maps.googleapis.com/maps/api/js?key=AIzaSyDRKtDYplrerqy7O-IJ5mCnDg4ryciNtVo&sensor=false&libraries=places:2456
+[    4454ms] [LOG] web version is-  null @ https://app.shiprocket.in/app/js/app-2-2-30-42.js:11696
+[    4486ms] [WARNING] <link rel=preload> has an invalid `href` value @ https://app.shiprocket.in/login:9
+[    4642ms] TypeError: Cannot read properties of null (reading 'db')
+    at https://app.shiprocket.in/sr_login/serviceworker.js:2:8463
+    at https://app.shiprocket.in/sr_login/serviceworker.js:2:8692
+    at f.invoke (https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:6933)
+    at _.run (https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:2174)
+    at https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:30492
+    at f.invokeTask (https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:7558)
+    at _.runTask (https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:2816)
+    at X (https://app.shiprocket.in/sr_login/polyfills-E5CPB2HU.js:1:9648)
+[    4687ms] [LOG] [AnalyticsService] Initializing analytics service... @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    4687ms] [LOG] [AnalyticsRegistry] Initializing providers... @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    4697ms] [LOG] [AnalyticsRegistry] All providers initialized successfully @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    4698ms] [LOG] [AnalyticsService] Analytics service initialized successfully @ https://app.shiprocket.in/sr_login/chunk-LRILYYAO.js:0
+[    4924ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://app.shiprocket.in/login:0
+[    6381ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 731503586965557. @ https://connect.facebook.net/en_US/fbevents.js:183

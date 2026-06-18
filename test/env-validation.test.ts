@@ -9,7 +9,7 @@ describe("Env Validation", () => {
     process.env.SELLER_PASSWORD = "test";
 
     expect(() => validateEnv()).toThrow(
-      "SELLER_EMAIL and SELLER_PASSWORD are required"
+      "Authentication requires either SELLER_TOKEN or both SELLER_EMAIL and SELLER_PASSWORD"
     );
 
     process.env.SELLER_EMAIL = originalEmail;

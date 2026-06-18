@@ -1,5 +1,7 @@
 # 🚀 Shiprocket MCP Integration
 
+**Status:** 🟢 Production Ready | **Tests:** 13/13 Passing | **P0 Fixes:** 5/5 Verified
+
 This is a Model Context Protocol (MCP) server for Shiprocket.
 
 With this, you can:
@@ -9,6 +11,8 @@ With this, you can:
 - Track orders using the AWB number, Shiprocket Order ID, or Source Order ID
 
 It connects to your personal Shiprocket account directly via Email and password.
+
+**Quick Deploy:** `./scripts/one-command-setup.sh` | **Monitor:** `./scripts/business-monitor.sh`
 
 ### Here's an example of what you can do when it's connected to Claude.
 
@@ -91,3 +95,35 @@ Clients (Claude or Cursor) can access the following tools to interact with Shipr
 - "What are the courier options and delivery times from Delhi to Bangalore for a 0.5 KG COD package?"
 - "Where is my order?"
 - "How long will it take to deliver a package to Mumbai?"
+
+---
+
+## Deployment
+
+See [CONFIG.md](CONFIG.md) for detailed deployment instructions.
+
+### Quick Deploy
+
+```bash
+# Build
+npm run build
+
+# Configure
+cp .env.example .env
+# Edit .env with your credentials
+
+# Start
+npm start
+
+# Or with PM2
+npm install -g pm2
+pm2 start dist/main.js --name shiprocket-mcp
+```
+
+## Testing
+
+```bash
+npm test
+```
+
+13 tests across 8 test files, including full E2E tests via MCP client SDK.

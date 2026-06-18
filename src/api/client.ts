@@ -7,15 +7,20 @@ import axios, {
 } from "axios";
 import { API_DOMAINS } from "@/config";
 import { logger } from "@/logger";
-import { authenticate, type AuthCredentials } from "./auth";
+import {
+  ShiprocketAuth,
+  authenticate,
+  type AuthCredentials,
+} from "./auth";
 
 export interface ShiprocketClientOptions {
-  credentials: AuthCredentials;
+  credentials?: AuthCredentials;
+  auth?: ShiprocketAuth;
 }
 
 export class ShiprocketClient {
   private axiosInstance: AxiosInstance;
-  private credentials: AuthCredentials;
+  private auth: ShiprocketAuth;
   private token: string | null = null;
   private refreshPromise: Promise<string> | null = null;
   private refreshAttempts = 0;
@@ -24,7 +29,17 @@ export class ShiprocketClient {
   private lastRefreshAttemptTime = 0;
 
   constructor(options: ShiprocketClientOptions) {
-    this.credentials = options.credentials;
+    if (options.auth) {
+      this.auth = options.auth;
+    } else if (options.credentials) {
+      this.auth = new ShiprocketAuth({
+        email: options.credentials.email,
+        password: options.credentials.password,
+      });
+    } else {
+      throw new Error("ShiprocketClient requires either auth or credentials");
+    }
+
     this.axiosInstance = axios.create({
       baseURL: API_DOMAINS.SHIPROCKET,
       timeout: 30000,
@@ -61,7 +76,10 @@ export class ShiprocketClient {
           return Promise.reject(error);
         }
 
-        // Check if it's a 401 and we haven't exceeded retry attempts
+        if (this.auth.isSellerTokenMode()) {
+          return Promise.reject(error);
+        }
+
         if (
           error.response?.status === 401 &&
           !originalRequest._retry
@@ -94,7 +112,10 @@ export class ShiprocketClient {
   }
 
   private async refreshToken(): Promise<string> {
-    // If a refresh is already in progress, wait for it
+    if (this.auth.isSellerTokenMode()) {
+      throw new Error("Token refresh is disabled in SELLER_TOKEN mode");
+    }
+
     if (this.refreshPromise) {
       logger.info("Token refresh already in progress, waiting...");
       return this.refreshPromise;
@@ -107,7 +128,8 @@ export class ShiprocketClient {
       "Refreshing Shiprocket token"
     );
 
-    this.refreshPromise = authenticate(this.credentials)
+    this.refreshPromise = this.auth
+      .login()
       .then((token) => {
         this.token = token;
         this.refreshAttempts = 0;
@@ -127,12 +149,16 @@ export class ShiprocketClient {
 
   async initialize(): Promise<void> {
     if (!this.token) {
-      this.token = await this.refreshToken();
+      this.token = await this.auth.login();
     }
   }
 
   getToken(): string | null {
     return this.token;
+  }
+
+  isSellerTokenMode(): boolean {
+    return this.auth.isSellerTokenMode();
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
@@ -169,3 +195,5 @@ export function createShiprocketClient(
 ): ShiprocketClient {
   return new ShiprocketClient({ credentials });
 }
+
+export { authenticate };

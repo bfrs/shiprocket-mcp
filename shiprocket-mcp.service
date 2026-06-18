@@ -1,0 +1,21 @@
+[Unit]
+Description=Shiprocket MCP Server
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/shiprocket-mcp
+ExecStart=/usr/bin/node dist/main.js
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/shiprocket-mcp/logs
+
+[Install]
+WantedBy=multi-user.target

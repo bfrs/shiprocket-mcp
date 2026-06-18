@@ -1,0 +1,53 @@
+/* Admin CSS */
+.aargo-sr-meta-box {
+    padding: 10px;
+}
+
+.aargo-sr-meta-box p {
+    margin: 5px 0;
+}
+
+.aargo-sr-meta-box .button {
+    margin-top: 10px;
+}
+
+.aargo-sr-status-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.aargo-sr-info {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.aargo-sr-info table {
+    width: 100%;
+}
+
+.aargo-sr-info td {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.aargo-sr-tools {
+    margin-top: 20px;
+}
+
+.aargo-sr-tools .button {
+    margin-right: 10px;
+}
+
+/* Tracking page admin */
+.aargo-tracking-preview {
+    border: 1px solid #c3c4c7;
+    padding: 20px;
+    margin: 20px 0;
+    background: #f6f7f7;
+}

@@ -18,13 +18,14 @@ function isInitializeRequest(body: unknown): boolean {
 
 import { createMcpServer } from "@/mcp/index";
 import { storeConnection, deleteConnection, touchConnection, pruneStaleConnections, SESSION_TTL_MS } from "@/mcp/connections";
-import { createShiprocketClient } from "@/api/client";
+import { ShiprocketClient } from "@/api/client";
+import { ShiprocketAuth } from "@/api/auth";
 import { validateEnv } from "@/env";
 import { logger } from "@/logger";
 
 const transports: Record<string, StreamableHTTPServerTransport> = {};
 
-export async function startHttpTransport(): Promise<void> {
+export async function startHttpTransport(): Promise<{ server: Server; close: () => Promise<void> }> {
   const env = validateEnv();
   const port = env.PORT;
 
@@ -81,11 +82,12 @@ export async function startHttpTransport(): Promise<void> {
         transports[reservationId] = null as unknown as StreamableHTTPServerTransport;
 
         try {
-          const client = createShiprocketClient({
+          const auth = new ShiprocketAuth({
             email: env.SELLER_EMAIL,
             password: env.SELLER_PASSWORD,
+            sellerToken: env.SELLER_TOKEN,
           });
-
+          const client = new ShiprocketClient({ auth });
           await client.initialize();
 
           // Create a new MCP server per session
@@ -204,8 +206,7 @@ export async function startHttpTransport(): Promise<void> {
     }
   }, SESSION_TTL_MS);
 
-  async function shutdown(signal: string): Promise<void> {
-    logger.info({ signal }, "Shutting down HTTP transport...");
+  async function close(): Promise<void> {
     clearInterval(cleanupInterval);
     for (const sessionId in transports) {
       await transports[sessionId].close();
@@ -214,9 +215,16 @@ export async function startHttpTransport(): Promise<void> {
       server.close(() => resolve());
       setTimeout(() => resolve(), 5000).unref();
     });
+  }
+
+  async function shutdown(signal: string): Promise<void> {
+    logger.info({ signal }, "Shutting down HTTP transport...");
+    await close();
     process.exit(0);
   }
 
   process.on("SIGINT", () => void shutdown("SIGINT"));
   process.on("SIGTERM", () => void shutdown("SIGTERM"));
+
+  return { server, close };
 }
