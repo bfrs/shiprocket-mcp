@@ -1,6 +1,7 @@
 import { API_DOMAINS } from "@/config";
 import { connectionsBySessionId, globalSessionId } from "@/mcp/connections";
-import { mcpServer } from "@/mcp/index";
+import { createMcpServer } from "@/mcp/index";
+import { ALL_SCOPES } from "@/oauth/scopes";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import axios from "axios";
 
@@ -22,8 +23,9 @@ const transport = new StdioServerTransport();
 
     const sellerToken = data.token as string;
 
-    connectionsBySessionId[globalSessionId] = { transport, sellerToken };
-    await mcpServer.connect(transport);
+    // The seller logged in with their own credentials: every scope is implied.
+    connectionsBySessionId[globalSessionId] = { transport, sellerToken, scopes: new Set(ALL_SCOPES) };
+    await createMcpServer(ALL_SCOPES).connect(transport);
   } catch (err) {
     if (err instanceof axios.AxiosError) {
       console.error({

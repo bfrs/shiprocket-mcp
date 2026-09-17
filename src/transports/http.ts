@@ -8,9 +8,20 @@ import { createMcpServer } from "@/mcp/index";
 import { connectionsBySessionId, expiredSellerTokenSessions } from "@/mcp/connections";
 import { oauthRouter } from "@/oauth/router";
 import { getAccessTokenData, revokeAccessToken } from "@/oauth/store";
+import { loadKey } from "@/oauth/crypto";
+import { parseScope } from "@/oauth/scopes";
 
 if (process.env.NODE_ENV === "production" && !process.env.OAUTH_ISSUER) {
   console.error("FATAL: OAUTH_ISSUER environment variable must be set in production");
+  process.exit(1);
+}
+
+// Resolve the token-encryption key now rather than on the first login, so a
+// misconfigured pod dies at boot instead of serving 500s to the first seller.
+try {
+  loadKey();
+} catch (err) {
+  console.error(`FATAL: ${err instanceof Error ? err.message : String(err)}`);
   process.exit(1);
 }
 
@@ -74,6 +85,8 @@ async function startHttpServer(): Promise<void> {
   app.use("/oauth/authorize", authRateLimiter);
   app.use("/oauth/token", authRateLimiter);
   app.use("/oauth/register", authRateLimiter);
+  app.use("/oauth/revoke", authRateLimiter);
+  app.use("/oauth/consent", authRateLimiter);
 
   app.use(oauthRouter);
 
@@ -114,7 +127,8 @@ async function startHttpServer(): Promise<void> {
       return;
     }
 
-    // New session — bind this user's Shiprocket token to it
+    // New session — bind this user's Shiprocket token and granted scopes to it
+    const { scopes } = parseScope(tokenData.scope);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
       onsessioninitialized: (newSessionId) => {
@@ -123,12 +137,13 @@ async function startHttpServer(): Promise<void> {
           transport,
           sellerToken: tokenData.shiprocketToken,
           accessToken: token,
+          scopes,
         };
         transport.onclose = () => cleanupSession(newSessionId);
       },
     });
 
-    const server = createMcpServer();
+    const server = createMcpServer(scopes);
     await server.connect(transport);
     await transport.handleRequest(req, res, req.body);
   });
