@@ -1,9 +1,10 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer, type RegisteredTool } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z as zod } from "zod";
 import axios from "axios";
 import { connectionsBySessionId, globalSessionId, expiredSellerTokenSessions } from "./connections";
 import { AxiosError } from "axios";
 import { API_DOMAINS } from "@/config";
+import { permits, type Scope } from "@/oauth/scopes";
 
 const issuerBase = () =>
   process.env.OAUTH_ISSUER ?? `http://localhost:${process.env.APP_PORT ?? "3000"}`;
@@ -31,8 +32,55 @@ function shiprocketAuthError(sessionId: string) {
   };
 }
 
-export const initializeTools = (server: McpServer) => {
-  server.tool(
+// Scope enforcement (H3). Returned instead of calling upstream when the
+// session's grant does not cover the tool. The _meta hint mirrors
+// shiprocketAuthError so ChatGPT can offer a re-auth with the wider scope.
+function insufficientScope(required: Scope) {
+  const base = issuerBase();
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: `insufficient_scope: this action requires the "${required}" permission, which was not granted when this connection was authorized. Reconnect and allow it to continue.`,
+      },
+    ],
+    _meta: {
+      "mcp/www_authenticate": [
+        `Bearer resource_metadata="${base}/.well-known/oauth-protected-resource", error="insufficient_scope", scope="${required}", error_description="The granted scope does not cover this tool"`,
+      ],
+    },
+    isError: true,
+  };
+}
+
+/** Null when the session may run the tool; otherwise the error result to return. */
+function requireScope(sessionId: string, required: Scope) {
+  const granted = connectionsBySessionId[sessionId]?.scopes;
+  return granted && permits(granted, required) ? null : insufficientScope(required);
+}
+
+/**
+ * Register every tool against the scopes this server instance was created
+ * with. HTTP creates one McpServer per session, so `tools/list` only shows
+ * what that token can run; the per-call check inside `guard` is the second
+ * line of defence for a client that calls a tool it was never shown.
+ */
+export const initializeTools = (server: McpServer, scopes: Iterable<Scope>) => {
+  const granted = new Set(scopes);
+
+  const guard = (required: Scope, tool: RegisteredTool): void => {
+    if (!granted.has(required)) tool.disable();
+
+    const original = tool.callback as (...cbArgs: unknown[]) => unknown;
+    tool.callback = ((...cbArgs: unknown[]) => {
+      // The SDK passes the request context last, whatever the arg shape.
+      const extra = cbArgs[cbArgs.length - 1] as { sessionId?: string };
+      const denied = requireScope(extra.sessionId ?? globalSessionId, required);
+      return denied ?? original(...cbArgs);
+    }) as RegisteredTool["callback"];
+  };
+
+  guard("seller:read", server.tool(
     "estimated_delivery",
     `Get the Estimated Date of Delivery (EDD) for a given destination.
     
@@ -96,9 +144,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:read", server.tool(
     "order_track",
     `Get order tracking related information.
 
@@ -195,9 +243,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:read", server.tool(
     "order_list",
     `Get list of orders
     
@@ -341,9 +389,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:read", server.tool(
     "shipping_rate_calculator",
     `Get serviceable shipping couriers, their prices and EDDs (Estimated Delivery Dates).
     
@@ -445,9 +493,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:write", server.tool(
     "order_ship",
     `Ship order by assigning courier to the order
 
@@ -531,9 +579,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:write", server.tool(
     "order_schedule_pickup",
     `Schedule pickup for the order shipment
 
@@ -615,9 +663,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:write", server.tool(
     "order_cancel",
     `Cancel order
 
@@ -701,9 +749,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:write", server.tool(
     `order_create`,
     `Create order
 
@@ -852,9 +900,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:read", server.tool(
     "list_pickup_addresses",
     `Get all the pickup address of the seller
 
@@ -938,9 +986,9 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 
-  server.tool(
+  guard("seller:read", server.tool(
     "generate_shipment_label",
     `Generate shipment label and get the link of generated label as PDF file
 
@@ -993,5 +1041,5 @@ export const initializeTools = (server: McpServer) => {
         };
       }
     }
-  );
+  ));
 };

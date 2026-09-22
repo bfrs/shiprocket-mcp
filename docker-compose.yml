@@ -10,6 +10,8 @@ services:
       APP_PORT: "3000"
       # Required in production — set to your public domain
       OAUTH_ISSUER: ${OAUTH_ISSUER}
+      # Required in production — encrypts seller tokens in Redis (openssl rand -base64 32)
+      TOKEN_ENC_KEY: ${TOKEN_ENC_KEY}
       # Redis connection
       REDIS_HOST: redis
       REDIS_PORT: "6379"
