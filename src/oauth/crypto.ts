@@ -9,6 +9,7 @@ const ENV_KEY = "TOKEN_ENC_KEY";
 const VERSION = "v1"; // bump when the key or algorithm changes; old blobs stay decryptable
 const KEY_BYTES = 32; // AES-256
 const IV_BYTES = 12;  // GCM standard nonce length
+const TAG_BYTES = 16; // full-length auth tag; pinned so a truncated tag is rejected
 
 let cachedKey: Buffer | null = null;
 
@@ -49,7 +50,7 @@ const b64u = (b: Buffer): string => b.toString("base64url");
 /** AES-256-GCM; output is `v1.<iv>.<ciphertext>.<tag>` in base64url. */
 export function encryptSecret(plain: string): string {
   const iv = crypto.randomBytes(IV_BYTES);
-  const cipher = crypto.createCipheriv("aes-256-gcm", loadKey(), iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", loadKey(), iv, { authTagLength: TAG_BYTES });
   const ciphertext = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
   return [VERSION, b64u(iv), b64u(ciphertext), b64u(cipher.getAuthTag())].join(".");
 }
@@ -61,7 +62,10 @@ export function decryptSecret(blob: string): string {
     throw new Error("unrecognised encrypted secret format");
   }
   const [, iv, ciphertext, tag] = parts.map((p) => Buffer.from(p, "base64url"));
-  const decipher = crypto.createDecipheriv("aes-256-gcm", loadKey(), iv);
+  if (iv.length !== IV_BYTES || tag.length !== TAG_BYTES) {
+    throw new Error("unrecognised encrypted secret format");
+  }
+  const decipher = crypto.createDecipheriv("aes-256-gcm", loadKey(), iv, { authTagLength: TAG_BYTES });
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
 }

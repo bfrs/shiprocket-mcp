@@ -38,6 +38,14 @@ describe("crypto", () => {
     expect(() => decryptSecret([v, iv, flipped, tag].join("."))).toThrow();
   });
 
+  it("rejects a truncated auth tag", () => {
+    // A 4-byte prefix of a valid tag still verifies under GCM unless the
+    // expected tag length is pinned, which cuts forgery cost to 2^32.
+    const [v, iv, ct, tag] = encryptSecret(SELLER_JWT).split(".");
+    const short = Buffer.from(tag, "base64url").subarray(0, 4).toString("base64url");
+    expect(() => decryptSecret([v, iv, ct, short].join("."))).toThrow(/unrecognised/);
+  });
+
   it("rejects a blob encrypted under a different key", () => {
     const blob = encryptSecret(SELLER_JWT);
     resetKeyForTests();
